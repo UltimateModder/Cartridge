@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cartridge — Retro Game Library</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#090912">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{--ac:#a78bfa;--bg:#090912;--bg2:#0d0d18;--card:#12121f;--tx:#efeaff;--mu:#9a98b8;--ln:#25253d;--r:14px}
 :root[data-theme=light]{--bg:#f6f3fc;--bg2:#fff;--card:#fff;--tx:#1d1733;--mu:#6c6486;--ln:#ddd6ef}
@@ -100,6 +101,24 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--ln);text-align:left}
 .sw button{width:30px;height:30px;border-radius:50%;border:2px solid var(--ln)}
 .note{background:var(--card);border-left:3px solid var(--ac);padding:10px 14px;border-radius:8px;color:var(--mu);font-size:13px;margin:10px 0}
 @media(max-width:760px){aside{position:fixed;z-index:20;height:100%;transform:translateX(-100%)}aside.open{transform:none;width:240px}aside.min{width:240px}aside.min .lb,aside.min .logo span{display:inline}.dh{flex-direction:column}}
+body{height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+aside{padding-top:env(safe-area-inset-top)}
+header{padding-top:max(12px,env(safe-area-inset-top))}
+#bnav{display:none}
+@media(pointer:coarse){.btn,select{min-height:44px}input,select,textarea{font-size:16px!important}nav button{padding:12px 10px}}
+@media(max-width:760px){
+header{padding:max(10px,env(safe-area-inset-top)) 12px 10px;gap:8px;flex-wrap:nowrap}
+header .btn{min-width:44px;padding:8px 12px}.tx{display:none}
+#content{padding:16px 14px calc(78px + env(safe-area-inset-bottom))}
+h1{font-size:24px}
+.grid{grid-template-columns:repeat(2,1fr);gap:12px}.row .card{width:132px}
+.stat{min-width:0;flex:1 1 40%}
+#bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--bg2);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom)}
+#bnav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px}
+#bnav button span{font-size:20px}#bnav button.on{color:var(--ac)}
+#toast{bottom:calc(84px + env(safe-area-inset-bottom));max-width:90vw;text-align:center}
+dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:90dvh;padding-bottom:max(22px,env(safe-area-inset-bottom))}
+.acts .btn{flex:1 1 auto}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -109,14 +128,15 @@ td,th{padding:5px 6px;border-bottom:1px solid var(--ln);text-align:left}
 <header>
 <button class="btn" id="tg" aria-label="Toggle sidebar">☰</button>
 <input id="q" type="search" placeholder="Search your library…" aria-label="Search">
-<button class="btn" id="rnd">🎲 Random</button>
-<button class="btn pri" id="imp">+ Import games</button>
+<button class="btn" id="rnd" aria-label="Random game">🎲<span class="tx"> Random</span></button>
+<button class="btn pri" id="imp" aria-label="Import games">+<span class="tx"> Import games</span></button>
 </header>
 <div id="content" tabindex="-1"></div>
 </main>
 <input type="file" id="fi" multiple hidden>
 <input type="file" id="fd" webkitdirectory hidden>
 <input type="file" id="fc" accept="image/*" hidden>
+<div id="bnav" role="navigation" aria-label="Quick navigation"></div>
 <dialog id="dlg"></dialog>
 <div id="toast" role="status"></div>
 <script>
@@ -175,6 +195,8 @@ async function setCover(g,src){g.cover=src||'';g.ar=src?await measure(src):0}
 async function backfill(){let ch=0;for(const g of games.filter(g=>g.cover&&g.ar===undefined)){g.ar=await measure(g.cover);await putG(g);ch=1}if(ch)render()}
 async function autoCovers(l){let n=0;for(const [i,g] of l.entries()){toast(`Fetching cover art… ${i+1} of ${l.length}`);try{await setCover(g,await findCover(g));await putG(g);n++;render()}catch(e){if(/rejected/.test(e.message))break}}toast(`Found cover art for ${n} of ${l.length} game${l.length===1?'':'s'}.`)}
 let EMU=null;
+function goFS(){if(!(pref.fs??matchMedia('(pointer:coarse)').matches))return;const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{const r=f&&f.call(e,{navigationUI:'hide'});r&&r.catch&&r.catch(()=>{})}catch{}}
+function outFS(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch{}}
 const getSt=id=>new Promise(r=>{try{const q=db.transaction('states').objectStore('states').get(id);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
 async function saveState(){if(!EMU)return false;const {g,w}=EMU;try{const em=w.querySelector('iframe').contentWindow.EJS_emulator,st=em&&em.gameManager&&em.gameManager.getState();
 if(st&&st.length){await tx('states','readwrite',t=>t.objectStore('states').put(new Blob([st]),g.id));if(!g.state){g.state=true;await putG(g)}return true}}catch(e){}return false}
@@ -195,7 +217,7 @@ const card=g=>`<button class="card" data-id="${g.id}">${cover(g)}<div class="ct"
 
 function nav(){const cnt=id=>games.filter(g=>g.con===id).length;
 const it=(k,l,n,col)=>`<button data-v="${k}" class="${view===k?'on':''}">${col?`<span class="dot" style="background:${col}"></span>`:''}<span class="lb">${l}</span><span class="n">${n??''}</span></button>`;
-$('#nav').innerHTML=it('home','🏠 Home')+it('all','📚 All games',games.length)+it('fav','★ Favorites',games.filter(g=>g.fav).length)+it('recent','🕘 Recently added')+'<h6>Consoles</h6>'+cons().filter(c=>c.id!=='other'||cnt(c.id)).map(c=>it('c:'+c.id,esc(c.name),cnt(c.id),c.c)).join('')+'<h6>App</h6>'+it('set','⚙️ Settings')}
+$('#nav').innerHTML=it('home','🏠 Home')+it('all','📚 All games',games.length)+it('fav','★ Favorites',games.filter(g=>g.fav).length)+it('recent','🕘 Recently added')+'<h6>Consoles</h6>'+cons().filter(c=>c.id!=='other'||cnt(c.id)).map(c=>it('c:'+c.id,esc(c.name),cnt(c.id),c.c)).join('')+'<h6>App</h6>'+it('set','⚙️ Settings');$('#bnav').innerHTML=[['home','🏠','Home'],['all','📚','Library'],['fav','★','Favorites'],['set','⚙️','Settings']].map(([k,i,l])=>`<button data-v="${k}" class="${view===k?'on':''}"><span>${i}</span>${l}</button>`).join('')}
 function filtered(){let l=games.slice();const q=$('#q').value.trim().toLowerCase();
 if(view==='fav')l=l.filter(g=>g.fav);if(view.startsWith('c:'))l=l.filter(g=>g.con===view.slice(2));
 if(view==='recent'||pref.filter==='recent')l=l.filter(g=>Date.now()-g.added<7*864e5);
@@ -227,7 +249,7 @@ function settings(el){el.innerHTML=`<h1>Settings</h1><p class="sub">Preferences 
 <h2>Appearance</h2><label><input type="checkbox" id="th" ${pref.theme==='light'?'checked':''}> Light theme</label>
 <p>Accent color</p><div class="sw">${['#a78bfa','#ff4f8b','#ff8a3d','#f2c94c','#3ddc97','#38bdf8','#8b7bff'].map(c=>`<button style="background:${c}" data-ac="${c}" aria-label="Accent ${c}"></button>`).join('')}<input type="color" id="ac" value="${pref.ac}" aria-label="Custom accent"></div>
 <h2>Install app</h2>${ip?'<p class="sub">Install Cartridge as an app with its own window and icon.</p><button class="btn pri" id="ins">Install Cartridge</button>':'<div class="note">To install, open this page over HTTPS (for example GitHub Pages) or localhost. Chrome and Edge then offer Install in the address bar or menu. On iPhone and iPad use Share → Add to Home Screen. If you are already running it as an installed app, you’re all set.</div>'}
-<h2>Playing</h2><label><input type="checkbox" id="au" ${pref.auto!==false?'checked':''}> Save progress when quitting and resume next time</label><br><label><input type="checkbox" id="ap" ${pref.ap!==false?'checked':''}> Fetch cover art automatically when importing</label>
+<h2>Playing</h2><label><input type="checkbox" id="au" ${pref.auto!==false?'checked':''}> Save progress when quitting and resume next time</label><br><label><input type="checkbox" id="ap" ${pref.ap!==false?'checked':''}> Fetch cover art automatically when importing</label><br><label><input type="checkbox" id="fs" ${(pref.fs??matchMedia('(pointer:coarse)').matches)?'checked':''}> Go fullscreen when playing (hides the status and navigation bars)</label>
 <p>3D resolution (N64, PSP)</p><select id="rs2"><option value="1">Native (fastest)</option><option value="2">2× (default)</option><option value="4">4× (needs a strong device)</option></select>
 <h2>Cover art (SteamGridDB)</h2><p class="sub">Covers are looked up in the free libretro box-art library first (no key needed; it matches your exact file name, like “Super Mario World (USA).sfc”). SteamGridDB is the fallback and needs a free key from your profile, under Preferences → API.</p>
 <div class="bar"><input id="sk" type="password" autocomplete="off" placeholder="API key" value="${esc(SG().key)}" style="padding:8px;flex:1;min-width:200px"><button class="btn" id="sks">Save key</button><button class="btn" id="skt">Test key</button></div>
@@ -248,6 +270,7 @@ $('#ska').onclick=async()=>{sv();const t=games.filter(g=>!g.cover);if(!t.length)
 for(const [i,g] of t.entries()){toast(`Finding covers… ${i+1} of ${t.length}`);try{await setCover(g,await findCover(g));await putG(g);ok++}catch(e){fail++;last=e.message;if(/rejected|reach/.test(last))break}}
 render();msg('Cover search finished',`${ok} found, ${fail} not found or failed.`+(fail&&last?' Last problem: '+last:''))};
 if(ip)$('#ins').onclick=async()=>{ip.prompt();await ip.userChoice;ip=null;render()};
+$('#fs').onchange=e=>{pref.fs=e.target.checked;savePref()};
 $('#au').onchange=e=>{pref.auto=e.target.checked;savePref()};$('#ap').onchange=e=>{pref.ap=e.target.checked;savePref()};$('#rs2').value=pref.res||2;$('#rs2').onchange=e=>{pref.res=+e.target.value;savePref()};
 $('#th').onchange=e=>{pref.theme=e.target.checked?'light':'dark';savePref()};
 el.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{pref.ac=b.dataset.ac;savePref();$('#ac').value=pref.ac});$('#ac').oninput=e=>{pref.ac=e.target.value;savePref()};
@@ -298,6 +321,7 @@ if(g.con==='other'){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">Whic
 $('#pcx').onclick=()=>d.close();$('#pcg').onclick=async()=>{g.con=$('#pc2').value;await putG(g);render();d.close();if(g.con!=='other')play(g)};if(!d.open)d.showModal();return}
 if(!core)return msg(`${c.name} can’t run in the browser`,`The browser player (EmulatorJS) has no working core for this system. Open “${g.file}” in a standalone emulator${TIPS[g.con]?', for example '+TIPS[g.con]:''}. This entry still works for organizing and favorites.`);
 if(core==='psp'&&!self.crossOriginIsolated&&!pspOk)return confirmD('PSP games need a special browser mode (cross-origin isolation, usually over HTTPS) that this page doesn’t have, so it will most likely stay black. Try anyway?',async()=>{pspOk=true;play(g)});
+goFS();
 const blob=await new Promise(r=>{try{const q=db.transaction('roms').objectStore('roms').get(g.id);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
 if(!blob)return msg('ROM file not found','The stored copy is missing, likely because the browser cleared its storage. Remove this entry and import the file again.');
 g.played=Date.now();putG(g);$('#dlg').close();
@@ -305,14 +329,14 @@ let sUrl='';if(pref.auto!==false&&g.state){const sb=await getSt(g.id);if(sb)sUrl
 const url=URL.createObjectURL(blob),w=document.createElement('div');w.id='emu';
 w.innerHTML=`<div class="hz" id="hz"><button class="xq" id="eq" aria-label="Quit game">✕</button></div><iframe title="Emulator" allow="fullscreen; gamepad; autoplay; cross-origin-isolated"></iframe>`;
 const hz=w.querySelector('#hz');hz.onclick=e=>{if(e.target.closest('.xq'))return;hz.classList.add('show');clearTimeout(hz.t);hz.t=setTimeout(()=>hz.classList.remove('show'),3500)};
-try{w.requestFullscreen&&w.requestFullscreen().catch(()=>{})}catch{}
+
 document.body.appendChild(w);
 const base=new URL((SG().ejs||'https://cdn.emulatorjs.org/stable/data/').replace(/\/?$/,'/'),location.href).href;
 w.querySelector('iframe').srcdoc=`<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;height:100%;overflow:hidden;background:#000;overscroll-behavior:none}#game{width:100%;height:100%}</style><body><div id="game"></div><script>EJS_player='#game';EJS_core=${JSON.stringify(core)};EJS_gameUrl=${JSON.stringify(url)};EJS_gameName=${JSON.stringify(g.title)};EJS_pathtodata=${JSON.stringify(base)};EJS_startOnLoaded=true;EJS_color='#a78bfa';EJS_defaultOptions=${JSON.stringify(resOpts(core))};${sUrl?'EJS_loadStateURL='+JSON.stringify(sUrl)+';':''}<\/script><script src="${base}loader.js" onerror="document.body.innerHTML='<p style=color:#fff;font-family:sans-serif;padding:20px>Couldn’t load the emulator files from ${base}. Check your connection or the emulator path in Settings.</p>'"><\/script></body>`;
-EMU={g,w};$('#eq').onclick=async()=>{$('#eq').disabled=true;let ok=false;if(pref.auto!==false)ok=await saveState();w.remove();EMU=null;URL.revokeObjectURL(url);if(sUrl)URL.revokeObjectURL(sUrl);render();if(ok)toast('Progress saved. It resumes next time.')};render()}
+EMU={g,w};$('#eq').onclick=async()=>{$('#eq').disabled=true;let ok=false;if(pref.auto!==false)ok=await saveState();w.remove();outFS();EMU=null;URL.revokeObjectURL(url);if(sUrl)URL.revokeObjectURL(sUrl);render();if(ok)toast('Progress saved. It resumes next time.')};render()}
 function msg(t,m){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">${esc(t)}</h2><p>${esc(m)}</p><div class="acts"><button class="btn pri" id="ok">OK</button></div>`;$('#ok').onclick=()=>d.close();if(!d.open)d.showModal()}
 
-document.addEventListener('click',e=>{const v=e.target.closest('[data-v]');if(v){view=v.dataset.v;$('#q').value='';$('#side').classList.remove('open');render();$('#content').scrollTop=0;return}
+document.addEventListener('click',e=>{if(!e.target.closest('#side,#tg'))$('#side').classList.remove('open');const v=e.target.closest('[data-v]');if(v){view=v.dataset.v;$('#q').value='';$('#side').classList.remove('open');render();$('#content').scrollTop=0;return}
 const c=e.target.closest('.card');if(c)details(c.dataset.id)});
 $('#tg').onclick=()=>{const s=$('#side');innerWidth<761?s.classList.toggle('open'):s.classList.toggle('min')};
 $('#q').oninput=()=>{if((view==='home'||view==='set')&&$('#q').value.trim())view='all';render()};
