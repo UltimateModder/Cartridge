@@ -81,6 +81,13 @@ h2{margin:26px 0 10px;font-size:18px}
 .row .card{width:150px;flex:none}
 .empty{border:2px dashed var(--ln);border-radius:20px;padding:50px 20px;text-align:center;color:var(--mu)}
 .pad{display:block;margin:0 auto 14px;width:180px;height:auto;filter:drop-shadow(0 0 14px color-mix(in srgb,var(--ac) 45%,transparent))}
+.lk{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.lc{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--ln);border-radius:var(--r);padding:10px 12px;transition:transform .15s,border-color .15s}
+.lc:hover{border-color:var(--ac);transform:translateY(-2px)}
+.la{display:flex;gap:12px;align-items:center;flex:1;min-width:0;color:inherit;text-decoration:none}
+.la b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.la small{display:block;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 35%,#7dd3fc));color:#12102a;font-weight:800;flex:none}
 .drop{outline:3px dashed var(--ac);outline-offset:-10px}
 dialog{background:var(--bg2);color:var(--tx);border:1px solid var(--ln);border-radius:18px;padding:22px;max-width:560px;width:92vw}
 dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
@@ -194,6 +201,7 @@ const measure=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(Math.min(1
 async function setCover(g,src){g.cover=src||'';g.ar=src?await measure(src):0}
 async function backfill(){let ch=0;for(const g of games.filter(g=>g.cover&&g.ar===undefined)){g.ar=await measure(g.cover);await putG(g);ch=1}if(ch)render()}
 async function autoCovers(l){let n=0;for(const [i,g] of l.entries()){toast(`Fetching cover art… ${i+1} of ${l.length}`);try{await setCover(g,await findCover(g));await putG(g);n++;render()}catch(e){if(/rejected/.test(e.message))break}}toast(`Found cover art for ${n} of ${l.length} game${l.length===1?'':'s'}.`)}
+const DECOMPS=[{c:"Zombies",n:"BO1 Zombies",u:"https://vel.gg/bo1z"},{c:"Zombies",n:"Moon",u:"https://moon-zombies.pages.dev"},{c:"Zombies",n:"Kino der Toten",u:"https://kino-der-toten.pages.dev"},{c:"Zombies",n:"BO3 Cheese Cube",u:"https://cheese-cube.pages.dev"},{c:"Shooters",n:"Black Ops 2",u:"https://vibeslops.luckeysystems.com"},{c:"Shooters",n:"Modern Warfare 2",u:"https://ovz-game-production.up.railway.app"},{c:"Shooters",n:"Halo CE",u:"https://mitchellhynes.com/halo"},{c:"Shooters",n:"Halo CE Mobile",u:"https://hcemobile.com"},{c:"Shooters",n:"Quake 1",u:"https://q1.pieter.com"},{c:"Shooters",n:"Quake 2",u:"https://q2.pieter.com"},{c:"Shooters",n:"Quake 3",u:"https://q3.pieter.com"},{c:"Shooters",n:"Return to Castle Wolfenstein",u:"https://rtcw.pieter.com"},{c:"Shooters",n:"Unreal Tournament",u:"https://ut.pieter.com"},{c:"Shooters",n:"Half-Life",u:"https://pixelsuft.github.io/hl/"},{c:"Shooters",n:"Half-Life / CS 1.6",u:"https://x8bitrain.github.io/webXash/"},{c:"Shooters",n:"CS Surf",u:"https://surfd.net"},{c:"Shooters",n:"Diablo",u:"https://johnimril.github.io/diablo_web/"},{c:"Open world / other",n:"GTA Vice City",u:"https://joncodeofficial.github.io/gta-vice-city-wasm/"},{c:"Open world / other",n:"The Simpsons: Hit & Run",u:"https://shar-wasm.cjoseph.workers.dev/?skipmovie"},{c:"Open world / other",n:"Skate 3",u:"https://skate.aaddpp.lol"},{c:"Open world / other",n:"Skate Rust",u:"https://global-terror.net"},{c:"Open world / other",n:"PES 6",u:"https://pes6.optijuegos.net"},{c:"Open world / other",n:"Hedgewars",u:"https://webwars.link"},{c:"Open world / other",n:"More GTA / Minecraft",u:"https://wasmarcade.com"}];
 let EMU=null;
 function goFS(){if(!(pref.fs??matchMedia('(pointer:coarse)').matches))return;const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{const r=f&&f.call(e,{navigationUI:'hide'});r&&r.catch&&r.catch(()=>{})}catch{}}
 function outFS(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch{}}
@@ -217,7 +225,7 @@ const card=g=>`<button class="card" data-id="${g.id}">${cover(g)}<div class="ct"
 
 function nav(){const cnt=id=>games.filter(g=>g.con===id).length;
 const it=(k,l,n,col)=>`<button data-v="${k}" class="${view===k?'on':''}">${col?`<span class="dot" style="background:${col}"></span>`:''}<span class="lb">${l}</span><span class="n">${n??''}</span></button>`;
-$('#nav').innerHTML=it('home','🏠 Home')+it('all','📚 All games',games.length)+it('fav','★ Favorites',games.filter(g=>g.fav).length)+it('recent','🕘 Recently added')+'<h6>Consoles</h6>'+cons().filter(c=>c.id!=='other'||cnt(c.id)).map(c=>it('c:'+c.id,esc(c.name),cnt(c.id),c.c)).join('')+'<h6>App</h6>'+it('set','⚙️ Settings');$('#bnav').innerHTML=[['home','🏠','Home'],['all','📚','Library'],['fav','★','Favorites'],['set','⚙️','Settings']].map(([k,i,l])=>`<button data-v="${k}" class="${view===k?'on':''}"><span>${i}</span>${l}</button>`).join('')}
+$('#nav').innerHTML=it('home','🏠 Home')+it('all','📚 All games',games.length)+it('fav','★ Favorites',games.filter(g=>g.fav).length)+it('recent','🕘 Recently added')+it('web','🌐 Browser Decomps')+'<h6>Consoles</h6>'+cons().filter(c=>c.id!=='other'||cnt(c.id)).map(c=>it('c:'+c.id,esc(c.name),cnt(c.id),c.c)).join('')+'<h6>App</h6>'+it('set','⚙️ Settings');$('#bnav').innerHTML=[['home','🏠','Home'],['all','📚','Library'],['fav','★','Favorites'],['set','⚙️','Settings']].map(([k,i,l])=>`<button data-v="${k}" class="${view===k?'on':''}"><span>${i}</span>${l}</button>`).join('')}
 function filtered(){let l=games.slice();const q=$('#q').value.trim().toLowerCase();
 if(view==='fav')l=l.filter(g=>g.fav);if(view.startsWith('c:'))l=l.filter(g=>g.con===view.slice(2));
 if(view==='recent'||pref.filter==='recent')l=l.filter(g=>Date.now()-g.added<7*864e5);
@@ -227,6 +235,7 @@ const s={title:(a,b)=>a.title.localeCompare(b.title),console:(a,b)=>con(a.con).n
 function empty(msg){return `<div class="empty">${PAD}<h2 style="margin-top:0">${msg||'Your library is empty'}</h2><p>Drop ROM files here, or import them yourself. Nothing is uploaded anywhere.</p><button class="btn pri" onclick="$('#fi').click()">Import games</button></div>`}
 function render(){nav();const el=$('#content');
 if(view==='set')return settings(el);
+if(view==='web')return web(el);
 if(view==='home'&&!$('#q').value.trim()){
 const used=cons().filter(c=>games.some(g=>g.con===c.id)).length,tot=games.reduce((a,g)=>a+g.size,0),fav=games.filter(g=>g.fav).length;
 const row=(t,sub,l)=>`<h2 style="margin-bottom:2px">${t}</h2><p class="sub" style="margin-bottom:12px">${sub}</p><div class="row">${l.slice(0,14).map(card).join('')}</div>`;
@@ -245,6 +254,20 @@ el.innerHTML=`<h1>${esc(title)}</h1><p class="sub">${l.length} game${l.length===
 $('#so').value=pref.sort;$('#fl').value=pref.filter;
 $('#so').onchange=e=>{pref.sort=e.target.value;savePref();render()};$('#fl').onchange=e=>{pref.filter=e.target.value;savePref();render()};$('#vm').onclick=()=>{pref.mode=pref.mode==='grid'?'list':'grid';savePref();render()}}
 
+function web(el){
+const q=$('#q').value.trim().toLowerCase(),all=DECOMPS.concat(LS('c_links',[]).map(x=>({...x,own:1}))).filter(l=>!q||(l.n+' '+l.u+' '+l.c).toLowerCase().includes(q)),cats=[...new Set(all.map(l=>l.c))];
+const card=l=>{let t=l.u;try{const u=new URL(l.u);t=u.hostname+(u.pathname==='/'?'':u.pathname)}catch{}
+return `<div class="lc"><a class="la" href="${esc(l.u)}" target="_blank" rel="noopener noreferrer"><span class="ic">${esc(l.n[0]||'?')}</span><span style="min-width:0;flex:1"><b>${esc(l.n)}</b><small>${esc(t)}</small></span><span style="color:var(--mu)">↗</span></a>${l.own?`<button class="btn" data-rl="${esc(l.u)}" aria-label="Remove ${esc(l.n)}">✕</button>`:''}</div>`};
+el.innerHTML=`<h1>Browser Decomps</h1><p class="sub">AI-assisted ports and decompilations of classic games that run in your browser.</p>
+<div class="note">These are links to third-party sites. They aren’t affiliated with this app and haven’t been verified. Some are fan ports that need your own game files. Be careful with any page that asks you to download or install something.</div>
+<div class="bar"><button class="btn pri" id="al">+ Add a link</button></div>`+(all.length?cats.map(c=>`<h2>${esc(c)}</h2><div class="lk">${all.filter(l=>l.c===c).map(card).join('')}</div>`).join(''):`<div class="empty"><h2 style="margin-top:0">No links match</h2></div>`);
+el.querySelectorAll('[data-rl]').forEach(b=>b.onclick=()=>confirmD('Remove this link from your list?',()=>{SV('c_links',LS('c_links',[]).filter(x=>x.u!==b.dataset.rl));render()}));
+$('#al').onclick=()=>{const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">Add a link</h2><label for="ln">Name</label><input id="ln"><label for="lu">Web address</label><input id="lu" placeholder="example.com/game" inputmode="url"><label for="lcat">Section</label><select id="lcat">${[...new Set(DECOMPS.map(x=>x.c).concat(['My links']))].map(c=>`<option>${esc(c)}</option>`).join('')}</select><div class="acts"><button class="btn" id="lx">Cancel</button><button class="btn pri" id="ls">Add</button></div>`;
+$('#lx').onclick=()=>d.close();
+$('#ls').onclick=()=>{const n=$('#ln').value.trim(),v=$('#lu').value.trim();let u;if(!n)return toast('Give the link a name.');
+try{u=new URL(/^https?:\/\//i.test(v)?v:'https://'+v);if(!/^https?:$/.test(u.protocol)||!u.hostname.includes('.'))throw 0}catch{return toast('Enter a valid web address.')}
+const l=LS('c_links',[]);if(l.some(x=>x.u===u.href)||DECOMPS.some(x=>x.u===u.href))return toast('That link is already in the list.');
+l.push({c:$('#lcat').value,n,u:u.href});SV('c_links',l);d.close();render()};d.showModal()}}
 function settings(el){el.innerHTML=`<h1>Settings</h1><p class="sub">Preferences and library management.</p>
 <h2>Appearance</h2><label><input type="checkbox" id="th" ${pref.theme==='light'?'checked':''}> Light theme</label>
 <p>Accent color</p><div class="sw">${['#a78bfa','#ff4f8b','#ff8a3d','#f2c94c','#3ddc97','#38bdf8','#8b7bff'].map(c=>`<button style="background:${c}" data-ac="${c}" aria-label="Accent ${c}"></button>`).join('')}<input type="color" id="ac" value="${pref.ac}" aria-label="Custom accent"></div>
