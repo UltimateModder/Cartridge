@@ -56,7 +56,7 @@ Play loads the EmulatorJS player from `cdn.emulatorjs.org` when you press Play, 
 1. **libretro thumbnails (default):** free, no key. Matches by file name, so the standard No-Intro style works best, like `Super Mario World (USA).sfc`. Names with underscores such as `Super_Mario_World__USA_.sfc` are cleaned up automatically.
 2. **SteamGridDB (optional fallback):** paste a free API key in **Settings → Cover art**.
 
-SteamGridDB's API does not appear to allow direct browser requests (CORS). If lookups fail, run a small proxy and set its URL in Settings.Avoid public CORS proxies, since your API key would pass through them.
+SteamGridDB's API does not appear to allow direct browser requests (CORS). If lookups fail, run a small proxy and set its URL in Settings. Avoid public CORS proxies, since your API key would pass through them.
 
 ## Install as an app (PWA)
 
