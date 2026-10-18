@@ -112,6 +112,7 @@ body{height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe
 aside{padding-top:env(safe-area-inset-top)}
 header{padding-top:max(12px,env(safe-area-inset-top))}
 #bnav{display:none}
+.chips{display:none}
 @media(pointer:coarse){.btn,select{min-height:44px}input,select,textarea{font-size:16px!important}nav button{padding:12px 10px}}
 @media(max-width:760px){
 header{padding:max(10px,env(safe-area-inset-top)) 12px 10px;gap:8px;flex-wrap:nowrap}
@@ -122,10 +123,14 @@ h1{font-size:24px}
 .stat{min-width:0;flex:1 1 40%}
 #bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--bg2);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom)}
 #bnav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px}
-#bnav button span{font-size:20px}#bnav button.on{color:var(--ac)}
+#bnav button span{font-size:20px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:4px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--ln);background:var(--card);border-radius:20px;padding:7px 15px;font-size:13px;color:var(--mu)}
+.chip.on{background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 35%,#7dd3fc));color:#12102a;border-color:transparent;font-weight:700}#bnav button.on{color:var(--ac)}
 #toast{bottom:calc(84px + env(safe-area-inset-bottom));max-width:90vw;text-align:center}
 dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:90dvh;padding-bottom:max(22px,env(safe-area-inset-bottom))}
 .acts .btn{flex:1 1 auto}}
+@media(max-width:760px) and (orientation:portrait){#tg{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -225,7 +230,7 @@ const card=g=>`<button class="card" data-id="${g.id}">${cover(g)}<div class="ct"
 
 function nav(){const cnt=id=>games.filter(g=>g.con===id).length;
 const it=(k,l,n,col)=>`<button data-v="${k}" class="${view===k?'on':''}">${col?`<span class="dot" style="background:${col}"></span>`:''}<span class="lb">${l}</span><span class="n">${n??''}</span></button>`;
-$('#nav').innerHTML=it('home','🏠 Home')+it('all','📚 All games',games.length)+it('fav','★ Favorites',games.filter(g=>g.fav).length)+it('recent','🕘 Recently added')+it('web','🌐 Browser Decomps')+'<h6>Consoles</h6>'+cons().filter(c=>c.id!=='other'||cnt(c.id)).map(c=>it('c:'+c.id,esc(c.name),cnt(c.id),c.c)).join('')+'<h6>App</h6>'+it('set','⚙️ Settings');$('#bnav').innerHTML=[['home','🏠','Home'],['all','📚','Library'],['fav','★','Favorites'],['set','⚙️','Settings']].map(([k,i,l])=>`<button data-v="${k}" class="${view===k?'on':''}"><span>${i}</span>${l}</button>`).join('')}
+$('#nav').innerHTML=it('home','🏠 Home')+it('all','📚 All games',games.length)+it('fav','★ Favorites',games.filter(g=>g.fav).length)+it('recent','🕘 Recently added')+it('web','🌐 Browser Decomps')+'<h6>Consoles</h6>'+cons().filter(c=>c.id!=='other'||cnt(c.id)).map(c=>it('c:'+c.id,esc(c.name),cnt(c.id),c.c)).join('')+'<h6>App</h6>'+it('set','⚙️ Settings');$('#bnav').innerHTML=[['home','🏠','Home'],['all','📚','Library'],['fav','⭐','Favorites'],['web','🌐','Decomps'],['set','⚙️','Settings']].map(([k,i,l])=>`<button data-v="${k}" class="${view===k||(k==='all'&&view.startsWith('c:'))?'on':''}"><span>${i}</span>${l}</button>`).join('')}
 function filtered(){let l=games.slice();const q=$('#q').value.trim().toLowerCase();
 if(view==='fav')l=l.filter(g=>g.fav);if(view.startsWith('c:'))l=l.filter(g=>g.con===view.slice(2));
 if(view==='recent'||pref.filter==='recent')l=l.filter(g=>Date.now()-g.added<7*864e5);
@@ -247,8 +252,9 @@ el.innerHTML=`<section class="hero"><div><p class="eye">✦ WELCOME TO YOUR PERS
 (games.length?`<div class="row">${games.slice().sort((a,b)=>b.added-a.added).slice(0,14).map(card).join('')}</div>`:`<div class="empty" style="padding:44px 20px">${PAD}<h3 style="margin:0 0 6px;color:var(--tx)">Start your collection</h3><p>Your game shelf is empty for now. Import files you own to see them appear here.</p><button class="btn pri" onclick="$('#imp').click()">+ Import your games</button></div>`);return}
 const l=filtered(),c=view.startsWith('c:')?con(view.slice(2)):null;
 const title=c?c.name:{all:'All games',fav:'Favorites',recent:'Recently added',home:'Search results'}[view];
+const chips=(view==='all'||view.startsWith('c:'))?`<div class="chips"><button class="chip ${view==='all'?'on':''}" data-v="all">All</button>${cons().filter(x=>games.some(g=>g.con===x.id)).map(x=>`<button class="chip ${view==='c:'+x.id?'on':''}" data-v="c:${x.id}">${esc(x.s)}</button>`).join('')}</div>`:'';
 el.innerHTML=`<h1>${esc(title)}</h1><p class="sub">${l.length} game${l.length===1?'':'s'}${c&&!c.core?' · no built-in browser emulator for this system — use an external emulator':''}</p>
-<div class="bar"><select id="so" aria-label="Sort"><option value="title">Sort: title</option><option value="console">Sort: console</option><option value="added">Sort: date added</option><option value="size">Sort: file size</option></select>
+${chips}<div class="bar"><select id="so" aria-label="Sort"><option value="title">Sort: title</option><option value="console">Sort: console</option><option value="added">Sort: date added</option><option value="size">Sort: file size</option></select>
 <select id="fl" aria-label="Filter"><option value="all">Show all</option><option value="fav">Favorites only</option><option value="recent">Added this week</option></select>
 <button class="btn" id="vm">${pref.mode==='grid'?'☰ List view':'▦ Grid view'}</button></div>`+(l.length?`<div class="${pref.mode}">${l.map(card).join('')}</div>`:empty(games.length?'No games match':'Your library is empty'));
 $('#so').value=pref.sort;$('#fl').value=pref.filter;
