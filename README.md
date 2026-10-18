@@ -73,16 +73,6 @@ PSP still needs a cross-origin-isolated page, which GitHub Pages does not provid
 - Your SteamGridDB key is stored in this browser's localStorage.
 - **Settings → Export metadata** saves titles and settings as JSON, without ROM files.
 
-## Project files
-
-| File | Purpose |
-|---|---|
-| `index.html` | The whole app |
-| `sgdb-proxy.py` | Optional local helper for SteamGridDB lookups |
-| `manifest.webmanifest` | PWA manifest |
-| `sw.js` | Service worker for installing and offline use |
-| `icons/` | App icons |
-
 ## Known limitations
 
 - Resume and the 3D resolution options rely on EmulatorJS settings that have had limited testing. Please open an issue if they do not behave as described.
