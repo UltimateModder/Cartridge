@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cartridge — Retro Game Library</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#090912">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{--ac:#a78bfa;--bg:#090912;--bg2:#0d0d18;--card:#12121f;--tx:#efeaff;--mu:#9a98b8;--ln:#25253d;--r:14px}
 :root[data-theme=light]{--bg:#f6f3fc;--bg2:#fff;--card:#fff;--tx:#1d1733;--mu:#6c6486;--ln:#ddd6ef}
@@ -57,7 +62,7 @@ h2{margin:26px 0 10px;font-size:18px}
 .stat b{font-size:26px;display:block}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .bar select,.bar .btn{padding:7px 10px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;align-items:start}
 .card{background:var(--card);border:1px solid var(--ln);border-radius:var(--r);overflow:hidden;cursor:pointer;text-align:left;padding:0;display:block;transition:transform .15s,box-shadow .15s}
 .card:hover{transform:translateY(-3px);box-shadow:0 10px 30px -10px var(--ac);border-color:var(--ac)}
 .cov{aspect-ratio:3/4;background-size:cover;background-position:center;display:grid;place-items:center;position:relative;font-size:46px;font-weight:900;color:#ffffffcc;text-shadow:0 2px 12px #0006}
@@ -68,15 +73,13 @@ h2{margin:26px 0 10px;font-size:18px}
 .ct span{font-size:12px;color:var(--mu)}
 .list{display:flex;flex-direction:column;gap:8px}
 .list .card{display:flex;align-items:center;gap:12px;padding:8px;width:100%}
-.list .cov{width:46px;aspect-ratio:1;font-size:20px;border-radius:8px;flex:none}
+.list .cov{width:46px;aspect-ratio:1!important;font-size:20px;border-radius:8px;flex:none}
 .list .cov em,.list .cov .st{display:none}
 .list .ct{flex:1;min-width:0;padding:0}
-.row{display:flex;gap:16px;overflow:auto;padding-bottom:8px}
+.row{display:flex;gap:16px;overflow:auto;padding-bottom:8px;align-items:flex-start}
 .row .card{width:150px;flex:none}
 .empty{border:2px dashed var(--ln);border-radius:20px;padding:50px 20px;text-align:center;color:var(--mu)}
-.empty .pad{width:120px;height:64px;margin:0 auto 18px;border-radius:30px;background:var(--card);border:2px solid var(--ln);position:relative;box-shadow:0 0 30px -6px var(--ac)}
-.empty .pad:before{content:"";position:absolute;left:22px;top:26px;width:30px;height:8px;background:var(--mu);border-radius:3px;box-shadow:11px -11px 0 -1px var(--mu),11px 11px 0 -1px var(--mu)}
-.empty .pad:after{content:"";position:absolute;right:20px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--ac);box-shadow:20px 10px 0 var(--ac)}
+.pad{display:block;margin:0 auto 14px;width:180px;height:auto;filter:drop-shadow(0 0 14px color-mix(in srgb,var(--ac) 45%,transparent))}
 .drop{outline:3px dashed var(--ac);outline-offset:-10px}
 dialog{background:var(--bg2);color:var(--tx);border:1px solid var(--ln);border-radius:18px;padding:22px;max-width:560px;width:92vw}
 dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
@@ -132,11 +135,6 @@ const BASE=[
 {id:'ps1',name:'PlayStation',s:'PS1',c:'#4864c4',x:'pbp,chd,ecm,m3u',core:'psx'},
 {id:'nds',name:'Nintendo DS',s:'NDS',c:'#9aa3b5',x:'nds,dsi',core:'nds'},
 {id:'psp',name:'PlayStation Portable',s:'PSP',c:'#3a3a4a',x:'cso',core:'psp'},
-{id:'dc',name:'Sega Dreamcast',s:'DC',c:'#f08a1c',x:'gdi,cdi',core:null},
-{id:'ps2',name:'PlayStation 2',s:'PS2',c:'#2a3d8f',x:'',core:null},
-{id:'gc',name:'Nintendo GameCube',s:'GC',c:'#6a5acd',x:'gcm,gcz,rvz,dol',core:null},
-{id:'3ds',name:'Nintendo 3DS',s:'3DS',c:'#d62f4a',x:'3ds,cia,cci,cxi,3dsx',core:null},
-{id:'wii',name:'Nintendo Wii',s:'WII',c:'#29b6d6',x:'wbfs,wad,wia',core:null},
 {id:'other',name:'Other consoles',s:'OTHER',c:'#777',x:'',core:null}];
 const AMBIG={bin:'Could be Genesis, PS1 or Atari',iso:'Could be PS1, PS2, PSP, Saturn or Dreamcast',cue:'Could be PS1, Saturn or Dreamcast',zip:'Could be arcade or any console',"7z":'Archives can hold any console'};
 const LS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
@@ -148,7 +146,7 @@ const cons=()=>BASE.concat(custom);
 const con=id=>cons().find(c=>c.id===id)||cons().find(c=>c.id==='other');
 const CORE_X={gbc:'gb',gg:'segaGG','32x':'sega32x',a52:'atari5200',a78:'atari7800',lnx:'lynx',j64:'jaguar'};
 const TIPS={ps2:'PCSX2 (Windows/Linux/macOS)','3ds':'Azahar (Windows/Linux/Android)',dc:'Flycast (Windows/Linux/Android)',gc:'Dolphin (Windows/Linux/macOS/Android)',wii:'Dolphin (Windows/Linux/macOS/Android)'};
-function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('cartridge',1);r.onupgradeneeded=()=>{r.result.createObjectStore('games',{keyPath:'id'});r.result.createObjectStore('roms')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('cartridge',2);r.onupgradeneeded=()=>{const d=r.result;['games','roms','states'].forEach(n=>{if(!d.objectStoreNames.contains(n))n==='games'?d.createObjectStore(n,{keyPath:'id'}):d.createObjectStore(n)})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 const tx=(st,mode,fn)=>new Promise((res,rej)=>{const t=db.transaction(st,mode),o=fn(t);t.oncomplete=()=>res(o&&o.result);t.onerror=()=>rej(t.error)});
 const putG=g=>tx('games','readwrite',t=>t.objectStore('games').put(g));
 const SG=()=>Object.assign({key:'',proxy:'',ejs:''},LS('c_sg',{}));
@@ -171,6 +169,18 @@ const r=await sgFetch('/search/autocomplete/'+encodeURIComponent(g.title));if(!r
 let l=await sgFetch('/grids/game/'+r[0].id+'?dimensions=600x900&types=static');if(!l||!l.length)l=await sgFetch('/grids/game/'+r[0].id+'?types=static');
 if(!l||!l.length)throw new Error('SteamGridDB has no cover art for “'+r[0].name+'”.');
 const url=l[0].url;try{const b=await (await fetch(url)).blob();if(b.size<3e6)return await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(b)})}catch{}return url}
+const AR={nes:.72,snes:1.4,sms:.72,gen:.72,sat:1,gb:.9,gbc:.9,gba:.9,n64:1.4,ps1:1,nds:.8,psp:.58,dc:1,ps2:.72,gc:.72,'3ds':.85,wii:.72};
+const measure=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(Math.min(1.8,Math.max(.5,i.naturalWidth/i.naturalHeight)));i.onerror=()=>r(0);i.src=src});
+async function setCover(g,src){g.cover=src||'';g.ar=src?await measure(src):0}
+async function backfill(){let ch=0;for(const g of games.filter(g=>g.cover&&g.ar===undefined)){g.ar=await measure(g.cover);await putG(g);ch=1}if(ch)render()}
+async function autoCovers(l){let n=0;for(const [i,g] of l.entries()){toast(`Fetching cover art… ${i+1} of ${l.length}`);try{await setCover(g,await findCover(g));await putG(g);n++;render()}catch(e){if(/rejected/.test(e.message))break}}toast(`Found cover art for ${n} of ${l.length} game${l.length===1?'':'s'}.`)}
+let EMU=null;
+const getSt=id=>new Promise(r=>{try{const q=db.transaction('states').objectStore('states').get(id);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
+async function saveState(){if(!EMU)return false;const {g,w}=EMU;try{const em=w.querySelector('iframe').contentWindow.EJS_emulator,st=em&&em.gameManager&&em.gameManager.getState();
+if(st&&st.length){await tx('states','readwrite',t=>t.objectStore('states').put(new Blob([st]),g.id));if(!g.state){g.state=true;await putG(g)}return true}}catch(e){}return false}
+const resOpts=core=>{const r=pref.res||2;if(core==='n64')return{'mupen64plus-43screensize':{1:'320x240',2:'640x480',4:'1280x960'}[r]};if(core==='psp')return{'ppsspp_internal_resolution':{1:'480x272',2:'960x544',4:'1920x1088'}[r]};return{}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&EMU&&pref.auto!==false)saveState()});
+const PAD='<svg class="pad" viewBox="0 0 160 104" aria-hidden="true"><g style="fill:none;stroke:var(--ac);stroke-width:5;stroke-linecap:round"><path d="M36 28C40 17 56 14 66 20"/><path d="M124 28C120 17 104 14 94 20"/></g><path d="M52 22H108C122 22 130 28 134 40L146 74C150 88 142 96 132 96C124 96 120 90 115 82C112 77 108 74 102 74H58C52 74 48 77 45 82C40 90 36 96 28 96C18 96 10 88 14 74L26 40C30 28 38 22 52 22Z" style="fill:var(--card);stroke:var(--ac);stroke-width:2.5;stroke-linejoin:round"/><g style="fill:none;stroke:var(--mu);stroke-width:2.5"><circle cx="46" cy="42" r="7"/><circle cx="96" cy="62" r="7"/></g><g style="fill:var(--mu)"><circle cx="46" cy="42" r="2.5"/><circle cx="96" cy="62" r="2.5"/><rect x="56.5" y="58.5" width="15" height="7" rx="2"/><rect x="60.5" y="54.5" width="7" height="15" rx="2"/><circle cx="106" cy="42" r="4.2"/><circle cx="114" cy="50" r="4.2"/><rect x="67" y="39" width="8" height="3" rx="1.5"/><rect x="85" y="39" width="8" height="3" rx="1.5"/></g><g style="fill:var(--ac)"><circle cx="114" cy="34" r="4.2"/><circle cx="122" cy="42" r="4.2"/><circle cx="80" cy="31" r="3.5"/></g></svg>';
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3500)};
 function theme(){document.documentElement.dataset.theme=pref.theme;document.documentElement.style.setProperty('--ac',pref.ac)}
 const savePref=()=>{SV('c_pref',pref);theme()};
@@ -180,7 +190,7 @@ const clean=n=>norm(n).replace(/[\[(][^\])]*[\])]/g,'').replace(/\s+/g,' ').trim
 function detect(name){const e=(name.split('.').pop()||'').toLowerCase();const c=cons().find(c=>c.x.split(',').includes(e));return c?c.id:null}
 function hue(s){let h=0;for(const ch of s)h=(h*31+ch.charCodeAt(0))%360;return h}
 function cover(g,extra=''){const c=con(g.con),st=g.cover?`background-image:url('${g.cover}')`:`background:linear-gradient(150deg,hsl(${hue(g.title)},55%,38%),${c.c})`;
-return `<div class="cov" style="${st}">${g.cover?'':esc((g.title[0]||'?').toUpperCase())}<em>${esc(c.s)}</em>${g.fav?'<span class="st">★</span>':''}</div>`}
+return `<div class="cov" style="aspect-ratio:${g.ar||AR[g.con]||.75};${st}">${g.cover?'':esc((g.title[0]||'?').toUpperCase())}<em>${esc(c.s)}</em>${g.fav?'<span class="st">★</span>':''}</div>`}
 const card=g=>`<button class="card" data-id="${g.id}">${cover(g)}<div class="ct"><b>${esc(g.title)}</b><span>${esc(con(g.con).s)} · ${fmt(g.size)}</span></div></button>`;
 
 function nav(){const cnt=id=>games.filter(g=>g.con===id).length;
@@ -192,7 +202,7 @@ if(view==='recent'||pref.filter==='recent')l=l.filter(g=>Date.now()-g.added<7*86
 if(pref.filter==='fav')l=l.filter(g=>g.fav);
 if(q)l=l.filter(g=>(g.title+' '+con(g.con).name+' '+g.file).toLowerCase().includes(q));
 const s={title:(a,b)=>a.title.localeCompare(b.title),console:(a,b)=>con(a.con).name.localeCompare(con(b.con).name)||a.title.localeCompare(b.title),added:(a,b)=>b.added-a.added,size:(a,b)=>b.size-a.size}[pref.sort];return l.sort(s)}
-function empty(msg){return `<div class="empty"><div class="pad"></div><h2 style="margin-top:0">${msg||'Your library is empty'}</h2><p>Drop ROM files here, or import them yourself. Nothing is uploaded anywhere.</p><button class="btn pri" onclick="$('#fi').click()">Import games</button></div>`}
+function empty(msg){return `<div class="empty">${PAD}<h2 style="margin-top:0">${msg||'Your library is empty'}</h2><p>Drop ROM files here, or import them yourself. Nothing is uploaded anywhere.</p><button class="btn pri" onclick="$('#fi').click()">Import games</button></div>`}
 function render(){nav();const el=$('#content');
 if(view==='set')return settings(el);
 if(view==='home'&&!$('#q').value.trim()){
@@ -203,7 +213,7 @@ el.innerHTML=`<section class="hero"><div><p class="eye">✦ WELCOME TO YOUR PERS
 <div class="sts">${stat('Total games','▤',games.length,'In your library')}${stat('Platforms','▦',used,'Represented in your collection')}${stat('Favorites','♡',fav,'Your all-time picks')}${stat('Library size','▥',fmt(tot),'Original file sizes')}</div>`+
 (games.some(g=>g.played)?row('Recently played','Jump back in',games.filter(g=>g.played).sort((a,b)=>b.played-a.played)):'')+(fav?row('Favorites','Your all-time picks',games.filter(g=>g.fav)):'')+
 `<h2 style="margin-bottom:2px">Recently added</h2><p class="sub" style="margin-bottom:12px">Freshly imported into your vault</p>`+
-(games.length?`<div class="row">${games.slice().sort((a,b)=>b.added-a.added).slice(0,14).map(card).join('')}</div>`:`<div class="empty" style="padding:44px 20px"><div class="pad"></div><h3 style="margin:0 0 6px;color:var(--tx)">Start your collection</h3><p>Your game shelf is empty for now. Import files you own to see them appear here.</p><button class="btn pri" onclick="$('#imp').click()">+ Import your games</button></div>`);return}
+(games.length?`<div class="row">${games.slice().sort((a,b)=>b.added-a.added).slice(0,14).map(card).join('')}</div>`:`<div class="empty" style="padding:44px 20px">${PAD}<h3 style="margin:0 0 6px;color:var(--tx)">Start your collection</h3><p>Your game shelf is empty for now. Import files you own to see them appear here.</p><button class="btn pri" onclick="$('#imp').click()">+ Import your games</button></div>`);return}
 const l=filtered(),c=view.startsWith('c:')?con(view.slice(2)):null;
 const title=c?c.name:{all:'All games',fav:'Favorites',recent:'Recently added',home:'Search results'}[view];
 el.innerHTML=`<h1>${esc(title)}</h1><p class="sub">${l.length} game${l.length===1?'':'s'}${c&&!c.core?' · no built-in browser emulator for this system — use an external emulator':''}</p>
@@ -216,6 +226,9 @@ $('#so').onchange=e=>{pref.sort=e.target.value;savePref();render()};$('#fl').onc
 function settings(el){el.innerHTML=`<h1>Settings</h1><p class="sub">Preferences and library management.</p>
 <h2>Appearance</h2><label><input type="checkbox" id="th" ${pref.theme==='light'?'checked':''}> Light theme</label>
 <p>Accent color</p><div class="sw">${['#a78bfa','#ff4f8b','#ff8a3d','#f2c94c','#3ddc97','#38bdf8','#8b7bff'].map(c=>`<button style="background:${c}" data-ac="${c}" aria-label="Accent ${c}"></button>`).join('')}<input type="color" id="ac" value="${pref.ac}" aria-label="Custom accent"></div>
+<h2>Install app</h2>${ip?'<p class="sub">Install Cartridge as an app with its own window and icon.</p><button class="btn pri" id="ins">Install Cartridge</button>':'<div class="note">To install, open this page over HTTPS (for example GitHub Pages) or localhost. Chrome and Edge then offer Install in the address bar or menu. On iPhone and iPad use Share → Add to Home Screen. If you are already running it as an installed app, you’re all set.</div>'}
+<h2>Playing</h2><label><input type="checkbox" id="au" ${pref.auto!==false?'checked':''}> Save progress when quitting and resume next time</label><br><label><input type="checkbox" id="ap" ${pref.ap!==false?'checked':''}> Fetch cover art automatically when importing</label>
+<p>3D resolution (N64, PSP)</p><select id="rs2"><option value="1">Native (fastest)</option><option value="2">2× (default)</option><option value="4">4× (needs a strong device)</option></select>
 <h2>Cover art (SteamGridDB)</h2><p class="sub">Covers are looked up in the free libretro box-art library first (no key needed; it matches your exact file name, like “Super Mario World (USA).sfc”). SteamGridDB is the fallback and needs a free key from your profile, under Preferences → API.</p>
 <div class="bar"><input id="sk" type="password" autocomplete="off" placeholder="API key" value="${esc(SG().key)}" style="padding:8px;flex:1;min-width:200px"><button class="btn" id="sks">Save key</button><button class="btn" id="skt">Test key</button></div>
 <div class="bar"><input id="sp" placeholder="Optional CORS proxy URL (only if the API is blocked by your browser)" value="${esc(SG().proxy)}" style="padding:8px;flex:1;min-width:200px"></div>
@@ -227,45 +240,48 @@ function settings(el){el.innerHTML=`<h1>Settings</h1><p class="sub">Preferences 
 ${custom.length?`<p>Custom: ${custom.map(c=>`<button class="btn" data-rc="${c.id}" title="Remove">${esc(c.name)} ✕</button>`).join(' ')}</p>`:''}
 <h2>Library</h2><div class="bar"><button class="btn" id="ex">Export metadata (JSON)</button><button class="btn dng" id="cl">Clear entire library</button></div>
 <div class="note"><b>About storage.</b> Games and covers are kept in this browser’s IndexedDB, on your device only. Browsers can limit or evict this storage, and private windows don’t keep it. If a game says its file is missing, import it again. Exported metadata contains titles and settings, not ROM files.</div>
-<div class="note"><b>Playing.</b> Play uses the open-source EmulatorJS player, loaded from cdn.emulatorjs.org when you press Play, so it needs internet. Your ROM still stays in your browser. Open this page from a local web server (for example <code>python3 -m http.server</code>) if the emulator won’t start from a file:// address. No BIOS files are bundled; Saturn, Sega CD and some arcade games need your own BIOS, which the player will ask for, and PS1 runs best with one. Playable in the browser: NES, SNES, Master System/Game Gear, Genesis/32X, Saturn, Game Boy, Game Boy Color, GBA, N64, PS1 and DS. PSP only works if the page is cross-origin isolated (HTTPS with special headers). Dreamcast, PS2, GameCube, Wii and 3DS have no working browser core, so they’re listed for organizing and you need a standalone emulator to play them. Heavy systems (DS, N64, Saturn) can be slow on older phones, and iOS 18.2 to 18.3 breaks emulation.</div>`;
+<div class="note"><b>Playing.</b> Play uses the open-source EmulatorJS player, loaded from cdn.emulatorjs.org when you press Play, so it needs internet. Your ROM still stays in your browser. Open this page from a local web server (for example <code>python3 -m http.server</code>) if the emulator won’t start from a file:// address. No BIOS files are bundled; Saturn, Sega CD and some arcade games need your own BIOS, which the player will ask for, and PS1 runs best with one. Playable in the browser: NES, SNES, Master System/Game Gear, Genesis/32X, Saturn, Game Boy, Game Boy Color, GBA, N64, PS1 and DS. PSP only works if the page is cross-origin isolated (HTTPS with special headers). Heavy systems (DS, N64, Saturn) can be slow on older phones, and iOS 18.2 to 18.3 breaks emulation.</div>`;
 const sv=()=>{SV('c_sg',{key:$('#sk').value.trim(),proxy:$('#sp').value.trim(),ejs:$('#ep').value.trim()})};
 $('#sks').onclick=()=>{sv();toast('API key saved.')};$('#eps').onclick=()=>{sv();toast('Emulator path saved.')};$('#sp').onchange=sv;
 $('#skt').onclick=async()=>{sv();try{await sgFetch('/search/autocomplete/mario');toast('Key works.')}catch(e){msg('SteamGridDB test failed',e.message)}};
 $('#ska').onclick=async()=>{sv();const t=games.filter(g=>!g.cover);if(!t.length)return toast('Every game already has a cover.');let ok=0,fail=0,last='';
-for(const [i,g] of t.entries()){toast(`Finding covers… ${i+1} of ${t.length}`);try{g.cover=await findCover(g);await putG(g);ok++}catch(e){fail++;last=e.message;if(/rejected|reach/.test(last))break}}
+for(const [i,g] of t.entries()){toast(`Finding covers… ${i+1} of ${t.length}`);try{await setCover(g,await findCover(g));await putG(g);ok++}catch(e){fail++;last=e.message;if(/rejected|reach/.test(last))break}}
 render();msg('Cover search finished',`${ok} found, ${fail} not found or failed.`+(fail&&last?' Last problem: '+last:''))};
+if(ip)$('#ins').onclick=async()=>{ip.prompt();await ip.userChoice;ip=null;render()};
+$('#au').onchange=e=>{pref.auto=e.target.checked;savePref()};$('#ap').onchange=e=>{pref.ap=e.target.checked;savePref()};$('#rs2').value=pref.res||2;$('#rs2').onchange=e=>{pref.res=+e.target.value;savePref()};
 $('#th').onchange=e=>{pref.theme=e.target.checked?'light':'dark';savePref()};
 el.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{pref.ac=b.dataset.ac;savePref();$('#ac').value=pref.ac});$('#ac').oninput=e=>{pref.ac=e.target.value;savePref()};
 $('#ca').onclick=()=>{const n=$('#cn').value.trim(),x=$('#ce').value.toLowerCase().replace(/[.\s]/g,'');if(!n||!x)return toast('Enter a console name and at least one extension.');custom.push({id:'x'+Date.now(),name:n,s:n.slice(0,5).toUpperCase(),c:`hsl(${hue(n)},60%,50%)`,x,core:null});SV('c_custom',custom);render();toast('Console added.')};
 el.querySelectorAll('[data-rc]').forEach(b=>b.onclick=()=>confirmD(`Remove the console “${b.textContent.slice(0,-2)}”? Its games move to Other consoles.`,async()=>{const id=b.dataset.rc;for(const g of games.filter(g=>g.con===id)){g.con='other';await putG(g)}custom=custom.filter(c=>c.id!==id);SV('c_custom',custom);render()}));
 $('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({games:games.map(({cover,...g})=>g),custom},null,1)],{type:'application/json'}));a.download='cartridge-library.json';a.click()};
-$('#cl').onclick=()=>confirmD('Delete every game, cover and note from this library? ROM files on your disk are not touched.',async()=>{await tx(['games','roms'],'readwrite',t=>{t.objectStore('games').clear();t.objectStore('roms').clear()});games=[];render();toast('Library cleared.')})}
+$('#cl').onclick=()=>confirmD('Delete every game, cover and note from this library? ROM files on your disk are not touched.',async()=>{await tx(['games','roms','states'],'readwrite',t=>{t.objectStore('games').clear();t.objectStore('roms').clear();t.objectStore('states').clear()});games=[];render();toast('Library cleared.')})}
 
 function confirmD(msg,fn){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">Are you sure?</h2><p>${esc(msg)}</p><div class="acts"><button class="btn" value="x">Cancel</button><button class="btn dng" id="yes">Confirm</button></div>`;d.querySelector('.btn').onclick=()=>d.close();$('#yes').onclick=async()=>{d.close();await fn()};d.showModal()}
 function conOpts(sel){return cons().map(c=>`<option value="${c.id}" ${c.id===sel?'selected':''}>${esc(c.name)}</option>`).join('')}
 
 async function addFiles(files){files=[...files];if(!files.length)return;
-const res=[];let ok=0;
+const res=[],added=[];let ok=0;
 for(const f of files){const e=(f.name.split('.').pop()||'').toLowerCase();let id=detect(f.name),st='Imported';
 if(f.size===0){res.push([f.name,0,'—','Skipped: file is empty']);continue}
 if(f.name.startsWith('.')||/^(txt|nfo|jpg|png|md|db|ini|exe|dll)$/.test(e)){res.push([f.name,f.size,'—','Skipped: not a game file']);continue}
 if(games.some(g=>g.file===f.name&&g.size===f.size)){res.push([f.name,f.size,'—','Skipped: already in library']);continue}
 if(!id){id='other';st=AMBIG[e]?'Imported — choose console ('+AMBIG[e]+')':'Imported — unknown type, choose console'}
 const g={id:crypto.randomUUID(),title:clean(f.name),file:f.name,size:f.size,con:id,added:Date.now(),fav:false,desc:'',cover:'',played:0};
-try{await tx(['games','roms'],'readwrite',t=>{t.objectStore('games').put(g);t.objectStore('roms').put(f,g.id)});games.push(g);ok++;res.push([f.name,f.size,con(id).s,st])}
+try{await tx(['games','roms'],'readwrite',t=>{t.objectStore('games').put(g);t.objectStore('roms').put(f,g.id)});games.push(g);added.push(g);ok++;res.push([f.name,f.size,con(id).s,st])}
 catch(err){res.push([f.name,f.size,'—','Failed: browser storage is full or blocked'])}}
 render();const d=$('#dlg');
 d.innerHTML=`<h2 style="margin-top:0">Import complete: ${ok} of ${files.length} added</h2><div style="max-height:50vh;overflow:auto"><table><tr><th>File</th><th>Size</th><th>Console</th><th>Status</th></tr>${res.map(r=>`<tr><td>${esc(r[0])}</td><td>${fmt(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join('')}</table></div><div class="acts"><button class="btn pri" id="ok">Done</button></div>`;
-$('#ok').onclick=()=>d.close();d.showModal()}
+$('#ok').onclick=()=>d.close();d.showModal();if(pref.ap!==false&&added.length)autoCovers(added)}
 
 function details(id){const g=games.find(x=>x.id===id);if(!g)return;const c=con(g.con),d=$('#dlg');
 d.innerHTML=`<div class="dh">${cover(g)}<div style="flex:1;min-width:0"><h2 style="margin:0 0 6px">${esc(g.title)}</h2><p class="sub" style="margin:0 0 8px">${esc(c.name)}</p><p>${esc(g.desc)||'<span style="color:var(--mu)">No description yet — add one with Edit.</span>'}</p>
 <table><tr><td>File</td><td>${esc(g.file)}</td></tr><tr><td>Size</td><td>${fmt(g.size)}</td></tr><tr><td>Added</td><td>${new Date(g.added).toLocaleDateString()}</td></tr><tr><td>Last played</td><td>${g.played?new Date(g.played).toLocaleString():'Never'}</td></tr></table></div></div>
-<div class="acts"><button class="btn" id="fv">${g.fav?'★ Unfavorite':'☆ Favorite'}</button><button class="btn" id="ed">Edit</button><button class="btn dng" id="rm">Remove</button><button class="btn" id="fcv">Find cover</button><button class="btn" id="cx">Close</button><button class="btn pri" id="pl">▶ Play</button></div>`;
+<div class="acts"><button class="btn" id="fv">${g.fav?'★ Unfavorite':'☆ Favorite'}</button><button class="btn" id="ed">Edit</button><button class="btn dng" id="rm">Remove</button>${g.state?'<button class="btn" id="rs">Reset save state</button>':''}<button class="btn" id="fcv">Find cover</button><button class="btn" id="cx">Close</button><button class="btn pri" id="pl">▶ Play</button></div>`;
 $('#cx').onclick=()=>d.close();
-$('#fcv').onclick=async()=>{const b=$('#fcv');b.disabled=true;b.textContent='Searching…';try{g.cover=await findCover(g);await putG(g);render();details(id);toast('Cover updated.')}catch(e){b.disabled=false;b.textContent='Find cover';msg('Couldn’t find a cover',e.message)}};
+if(g.state)$('#rs').onclick=async()=>{await tx('states','readwrite',t=>t.objectStore('states').delete(id));g.state=false;await putG(g);toast('Save state cleared.');details(id)};
+$('#fcv').onclick=async()=>{const b=$('#fcv');b.disabled=true;b.textContent='Searching…';try{await setCover(g,await findCover(g));await putG(g);render();details(id);toast('Cover updated.')}catch(e){b.disabled=false;b.textContent='Find cover';msg('Couldn’t find a cover',e.message)}};
 $('#fv').onclick=async()=>{g.fav=!g.fav;await putG(g);render();details(id)};
-$('#rm').onclick=()=>confirmD(`Remove “${g.title}” from the library? The stored copy is deleted from this browser; your original file is untouched.`,async()=>{await tx(['games','roms'],'readwrite',t=>{t.objectStore('games').delete(id);t.objectStore('roms').delete(id)});games=games.filter(x=>x.id!==id);render();toast('Game removed.')});
+$('#rm').onclick=()=>confirmD(`Remove “${g.title}” from the library? The stored copy is deleted from this browser; your original file is untouched.`,async()=>{await tx(['games','roms','states'],'readwrite',t=>{t.objectStore('games').delete(id);t.objectStore('roms').delete(id);t.objectStore('states').delete(id)});games=games.filter(x=>x.id!==id);render();toast('Game removed.')});
 $('#ed').onclick=()=>edit(g);$('#pl').onclick=()=>play(g);if(!d.open)d.showModal()}
 function edit(g){const d=$('#dlg'),cur={cover:g.cover};
 d.innerHTML=`<h2 style="margin-top:0">Edit game</h2><label for="et">Title</label><input id="et" value="${esc(g.title)}"><label for="ec">Console</label><select id="ec">${conOpts(g.con)}</select><label for="eds">Description</label><textarea id="eds" rows="3">${esc(g.desc)}</textarea>
@@ -274,7 +290,7 @@ d.innerHTML=`<h2 style="margin-top:0">Edit game</h2><label for="et">Title</label
 $('#pc').onclick=()=>{$('#fc').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(f.size>3e6)return toast('Cover must be under 3 MB.');const r=new FileReader();r.onload=()=>{cur.cover=r.result;toast('Cover selected — press Save.')};r.readAsDataURL(f)};$('#fc').click()};
 $('#rc').onclick=()=>{cur.cover='';toast('Cover will be removed on save.')};
 $('#cn2').onclick=()=>details(g.id);
-$('#sv').onclick=async()=>{const t=$('#et').value.trim();if(!t)return toast('Title can’t be empty.');Object.assign(g,{title:t,con:$('#ec').value,desc:$('#eds').value.trim(),cover:cur.cover});await putG(g);render();details(g.id)}}
+$('#sv').onclick=async()=>{const t=$('#et').value.trim();if(!t)return toast('Title can’t be empty.');Object.assign(g,{title:t,con:$('#ec').value,desc:$('#eds').value.trim()});await setCover(g,cur.cover);await putG(g);render();details(g.id)}}
 
 let pspOk=false;
 async function play(g){const c=con(g.con),ext=(g.file.split('.').pop()||'').toLowerCase(),core=CORE_X[ext]||c.core;
@@ -285,14 +301,15 @@ if(core==='psp'&&!self.crossOriginIsolated&&!pspOk)return confirmD('PSP games ne
 const blob=await new Promise(r=>{try{const q=db.transaction('roms').objectStore('roms').get(g.id);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
 if(!blob)return msg('ROM file not found','The stored copy is missing, likely because the browser cleared its storage. Remove this entry and import the file again.');
 g.played=Date.now();putG(g);$('#dlg').close();
+let sUrl='';if(pref.auto!==false&&g.state){const sb=await getSt(g.id);if(sb)sUrl=URL.createObjectURL(sb)}
 const url=URL.createObjectURL(blob),w=document.createElement('div');w.id='emu';
 w.innerHTML=`<div class="hz" id="hz"><button class="xq" id="eq" aria-label="Quit game">✕</button></div><iframe title="Emulator" allow="fullscreen; gamepad; autoplay; cross-origin-isolated"></iframe>`;
 const hz=w.querySelector('#hz');hz.onclick=e=>{if(e.target.closest('.xq'))return;hz.classList.add('show');clearTimeout(hz.t);hz.t=setTimeout(()=>hz.classList.remove('show'),3500)};
 try{w.requestFullscreen&&w.requestFullscreen().catch(()=>{})}catch{}
 document.body.appendChild(w);
 const base=new URL((SG().ejs||'https://cdn.emulatorjs.org/stable/data/').replace(/\/?$/,'/'),location.href).href;
-w.querySelector('iframe').srcdoc=`<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;height:100%;overflow:hidden;background:#000;overscroll-behavior:none}#game{width:100%;height:100%}</style><body><div id="game"></div><script>EJS_player='#game';EJS_core=${JSON.stringify(core)};EJS_gameUrl=${JSON.stringify(url)};EJS_gameName=${JSON.stringify(g.title)};EJS_pathtodata=${JSON.stringify(base)};EJS_startOnLoaded=true;<\/script><script src="${base}loader.js" onerror="document.body.innerHTML='<p style=color:#fff;font-family:sans-serif;padding:20px>Couldn’t load the emulator files from ${base}. Check your connection or the emulator path in Settings.</p>'"><\/script></body>`;
-$('#eq').onclick=()=>{w.remove();URL.revokeObjectURL(url);render()};render()}
+w.querySelector('iframe').srcdoc=`<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;height:100%;overflow:hidden;background:#000;overscroll-behavior:none}#game{width:100%;height:100%}</style><body><div id="game"></div><script>EJS_player='#game';EJS_core=${JSON.stringify(core)};EJS_gameUrl=${JSON.stringify(url)};EJS_gameName=${JSON.stringify(g.title)};EJS_pathtodata=${JSON.stringify(base)};EJS_startOnLoaded=true;EJS_color='#a78bfa';EJS_defaultOptions=${JSON.stringify(resOpts(core))};${sUrl?'EJS_loadStateURL='+JSON.stringify(sUrl)+';':''}<\/script><script src="${base}loader.js" onerror="document.body.innerHTML='<p style=color:#fff;font-family:sans-serif;padding:20px>Couldn’t load the emulator files from ${base}. Check your connection or the emulator path in Settings.</p>'"><\/script></body>`;
+EMU={g,w};$('#eq').onclick=async()=>{$('#eq').disabled=true;let ok=false;if(pref.auto!==false)ok=await saveState();w.remove();EMU=null;URL.revokeObjectURL(url);if(sUrl)URL.revokeObjectURL(sUrl);render();if(ok)toast('Progress saved. It resumes next time.')};render()}
 function msg(t,m){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">${esc(t)}</h2><p>${esc(m)}</p><div class="acts"><button class="btn pri" id="ok">OK</button></div>`;$('#ok').onclick=()=>d.close();if(!d.open)d.showModal()}
 
 document.addEventListener('click',e=>{const v=e.target.closest('[data-v]');if(v){view=v.dataset.v;$('#q').value='';$('#side').classList.remove('open');render();$('#content').scrollTop=0;return}
@@ -306,9 +323,11 @@ const cont=$('#content');['dragover','dragenter'].forEach(ev=>document.addEventL
 ['dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();if(ev==='drop'||e.target===document.documentElement||!e.relatedTarget)cont.classList.remove('drop')}));
 document.addEventListener('drop',e=>{if(e.dataTransfer.files.length)addFiles(e.dataTransfer.files)});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}});
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+let ip=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;if(view==='set')render()});addEventListener('appinstalled',()=>{ip=null;if(view==='set')render()});
 (async()=>{theme();try{db=await openDB();games=await tx('games','readonly',t=>t.objectStore('games').getAll())}catch(e){toast('Browser storage is unavailable, so the library can’t be saved in this window.');db=null}
 if(!db){db={transaction(){throw new Error('no db')}}}
-render()})();
+render();backfill()})();
 </script>
 </body>
 </html>
