@@ -1,5 +1,7 @@
 # Cartridge
 
+<img width="1869" height="1005" alt="Image" src="https://github.com/user-attachments/assets/454faa0f-faa1-488d-8587-3615b8c1de2d" />
+
 A private retro game library and launcher that lives in a website. Import the ROMs you own, organize them by console, fetch box art automatically, and play right in the browser, on desktop or mobile.
 
 No server, no account, no build step. Your files never leave your device.
