@@ -81,6 +81,6 @@ PSP still needs a cross-origin-isolated page, which GitHub Pages does not provid
 
 ## Credits
 
-- [EmulatorJS](https://emulatorjs.org) for in-browser emulation (check its license for your intended use).
+- [EmulatorJS](https://emulatorjs.org) for in-browser emulation.
 - [libretro thumbnails](https://thumbnails.libretro.com) for box art.
 - [SteamGridDB](https://www.steamgriddb.com) for optional cover art.
