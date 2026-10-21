@@ -158,6 +158,22 @@ aside.min .logo{justify-content:center;padding-left:0;padding-right:0}
 .lab b{font-size:13px;line-height:1.25;text-shadow:0 1px 2px #0009;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .list .lab{inset:12% 8% 16%;padding:2px}.list .lab b{display:none}
 .cart.wide{width:220px}.shot{width:100%;display:block;border-radius:6px;box-shadow:0 10px 24px -8px #000;image-rendering:pixelated}
+.cov em{display:none!important}
+.row .card{width:clamp(112px,calc(168px*var(--ar)),270px)}
+.dh{display:flex!important;flex-direction:row!important;gap:16px;align-items:flex-start}
+.dc{width:112px;flex:none}.dh .dc .cov{width:100%;border-radius:8px}.di{flex:1;min-width:0}.di h2{margin:0 0 2px;font-size:20px;padding-right:30px}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13px}.meta dt{color:var(--mu)}.meta dd{margin:0}
+.desc{color:var(--mu);font-size:14px;margin:14px 0 0}
+.big{width:100%;margin-top:16px;padding:13px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.tools .btn{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.file{font-size:11px;color:var(--mu);margin:14px 0 0;word-break:break-all}
+dialog .x{position:absolute;right:10px;top:10px;width:36px;height:36px;padding:0;border-radius:8px;background:none;border:0;color:var(--mu);font-size:18px;z-index:2}
+.cont{position:relative;overflow:hidden}
+.cbg{position:absolute;inset:-24px;background-size:cover;background-position:center;filter:blur(30px) brightness(.32);z-index:0}
+.cont>*:not(.cbg){position:relative;z-index:1}
+#content label{display:flex;gap:12px;align-items:flex-start;padding:9px 0;font-size:15px;line-height:1.35}
+#content br{display:none}
+#content input[type=checkbox]{width:20px;height:20px;margin:1px 0 0;flex:none}
 body{height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 aside{padding-top:env(safe-area-inset-top)}
 header{padding-top:max(12px,env(safe-area-inset-top))}
@@ -241,10 +257,11 @@ const LRX={gbc:'Nintendo - Game Boy Color',gg:'Sega - Game Gear',a78:'Atari - 78
 const imgOk=u=>new Promise(r=>{const i=new Image();const t=setTimeout(()=>r(false),8000);i.onload=()=>{clearTimeout(t);r(true)};i.onerror=()=>{clearTimeout(t);r(false)};i.src=u});
 const enc=n=>encodeURIComponent(n).replace(/\(/g,'%28').replace(/\)/g,'%29');
 async function lrCover(g){const ext=(g.file.split('.').pop()||'').toLowerCase(),sys=LRX[ext]||LR[g.con];if(!sys)return null;
-const stem=norm(g.file),m=stem.match(/^[^(]*\([^)]*\)/),names=[stem];if(m&&m[0]!==stem)names.push(m[0].trim());
-if(!stem.includes('('))['(USA)','(Europe)','(Japan)','(World)'].forEach(r=>names.push(stem+' '+r));
-for(const n of names){const u='https://thumbnails.libretro.com/'+enc(sys)+'/Named_Boxarts/'+enc(n.replace(/[&*\/:`<>?\\|]/g,'_'))+'.png';
-if(await imgOk(u)){try{const b=await (await fetch(u)).blob();if(b.size<3e6)return await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(b)})}catch{}return u}}return null}
+const RG=['(USA)','(Europe)','(Japan)','(World)','(USA, Europe)','(Japan, USA)','(Europe, Australia)','(USA, Australia)'],names=[];
+for(const base of [norm(g.file),clean(g.file)]){const m=base.match(/^[^(]*\([^)]*\)/);names.push(base);if(m&&m[0]!==base)names.push(m[0].trim());if(!base.includes('('))RG.forEach(r=>names.push(base+' '+r))}
+const uniq=[...new Set(names)];
+for(const dir of ['Named_Boxarts','Named_Titles']){const urls=uniq.map(n=>'https://thumbnails.libretro.com/'+enc(sys)+'/'+dir+'/'+enc(n.replace(/[&*\/:`<>?\\|]/g,'_'))+'.png'),ok=await Promise.all(urls.map(imgOk)),i=ok.indexOf(true);
+if(i>=0){const u=urls[i];try{const b=await (await fetch(u)).blob();if(b.size<3e6)return await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)})}catch{}return u}}return null}
 async function findCover(g){const a=await lrCover(g);if(a)return a;return sgCover(g)}
 async function sgCover(g){if(!SG().key)throw new Error('No match in the free libretro library, and no SteamGridDB key is set in Settings. Rename the file to its standard No-Intro name, or add a key.');
 const r=await sgFetch('/search/autocomplete/'+encodeURIComponent(g.title));if(!r||!r.length)throw new Error('No match on SteamGridDB for “'+g.title+'”. Try editing the title.');
@@ -253,6 +270,7 @@ if(!l||!l.length)throw new Error('SteamGridDB has no cover art for “'+r[0].nam
 const url=l[0].url;try{const b=await (await fetch(url)).blob();if(b.size<3e6)return await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(b)})}catch{}return url}
 const AR={nes:.72,snes:1.4,sms:.72,gen:.72,sat:1,gb:.9,gbc:.9,gba:.9,n64:1.4,ps1:1,nds:.8,psp:.58,dc:1,ps2:.72,gc:.72,'3ds':.85,wii:.72};
 const measure=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(Math.min(1.8,Math.max(.5,i.naturalWidth/i.naturalHeight)));i.onerror=()=>r(0);i.src=src});
+const urlToCover=async u=>{try{const b=await (await fetch(u)).blob();return await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)})}catch{return u}};
 async function shrink(src){if(!src||!src.startsWith('data:'))return src;try{const im=await new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=src}),k=Math.min(1,640/Math.max(im.naturalWidth,im.naturalHeight));if(k===1&&src.length<2e5)return src;const c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85)}catch{return src}}
 async function setCover(g,src){src=await shrink(src||'');g.cover=src||'';g.ar=src?await measure(src):0}
 async function backfill(){let ch=0;for(const g of games.filter(g=>g.cover&&g.ar===undefined)){g.ar=await measure(g.cover);await putG(g);ch=1}if(ch)render()}
@@ -278,8 +296,14 @@ let EMU=null;
 function goFS(){if(!(pref.fs??matchMedia('(pointer:coarse)').matches))return;const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{const r=f&&f.call(e,{navigationUI:'hide'});r&&r.catch&&r.catch(()=>{})}catch{}}
 function outFS(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch{}}
 const getSt=id=>new Promise(r=>{try{const q=db.transaction('states').objectStore('states').get(id);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
+async function grabShot(em){
+const api=()=>new Promise(res=>{try{if(typeof em.screenshot!=='function')return res(null);const t=setTimeout(()=>res(null),2500);em.screenshot(b=>{clearTimeout(t);res(b instanceof Blob?b:(b&&b.length?new Blob([b],{type:'image/png'}):null))},'canvas','jpeg',1)}catch{res(null)}});
+let b=await api();if(b)return b;
+try{const gm=em.gameManager.screenshot&&em.gameManager.screenshot();if(gm&&gm.length)return new Blob([gm],{type:'image/png'})}catch{}
+try{const cv=EMU.w.querySelector('iframe').contentDocument.querySelector('canvas');if(cv)return await new Promise(r=>cv.toBlob(r,'image/jpeg',.8))}catch{}
+return null}
 async function saveState(){if(!EMU)return false;const {g,w}=EMU;try{const em=w.querySelector('iframe').contentWindow.EJS_emulator,st=em&&em.gameManager&&em.gameManager.getState();
-if(st&&st.length){await tx('states','readwrite',t=>t.objectStore('states').put(new Blob([st]),g.id));if(!g.state){g.state=true;await putG(g)}try{const sc=em.gameManager.screenshot&&em.gameManager.screenshot();if(sc&&sc.length)await tx('states','readwrite',t=>t.objectStore('states').put(new Blob([sc],{type:'image/png'}),'shot:'+g.id))}catch{}return true}}catch(e){}return false}
+if(st&&st.length){await tx('states','readwrite',t=>t.objectStore('states').put(new Blob([st]),g.id));if(!g.state){g.state=true;await putG(g)}try{const sb=await grabShot(em);if(sb)await tx('states','readwrite',t=>t.objectStore('states').put(sb,'shot:'+g.id))}catch{}return true}}catch(e){}return false}
 const resOpts=core=>{const r=pref.res||2;if(core==='n64')return{'mupen64plus-43screensize':{1:'320x240',2:'640x480',4:'1280x960'}[r]};if(core==='psp')return{'ppsspp_internal_resolution':{1:'480x272',2:'960x544',4:'1920x1088'}[r]};return{}};
 document.addEventListener('visibilitychange',()=>{if(!EMU)return;if(document.hidden){addTime();EMU.t0=null;if(pref.auto!==false)saveState()}else EMU.t0=Date.now()});
 const mk=p=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
@@ -295,7 +319,7 @@ function detect(name){const e=(name.split('.').pop()||'').toLowerCase();const c=
 function hue(s){let h=0;for(const ch of s)h=(h*31+ch.charCodeAt(0))%360;return h}
 function cover(g,extra=''){const c=con(g.con),st=g.cover?`background-image:url('${g.cover}')`:`background:#15181a`;
 return `<div class="cov${g.cover?'':' nc'}" style="aspect-ratio:${g.ar||AR[g.con]||.75};${st}">${g.cover?'':`<span class="lab" style="--cc:${c.c}"><b>${esc(g.title)}</b></span>`}<em>${esc(c.s)}</em>${g.fav?`<span class="st">${IC.fav}</span>`:''}<span class="pl" role="button" aria-label="Play" data-play="${g.id}">${IC.played}</span></div>`}
-const card=g=>`<button class="card" data-id="${g.id}">${cover(g)}<div class="ct"><b>${esc(g.title)}</b><span>${esc(con(g.con).s)} · ${fmt(g.size)}</span></div></button>`;
+const card=g=>`<button class="card" data-id="${g.id}" style="--ar:${g.ar||AR[g.con]||.75}">${cover(g)}<div class="ct"><b>${esc(g.title)}</b><span>${esc(con(g.con).s)} · ${fmt(g.size)}</span></div></button>`;
 
 function nav(){const cnt=id=>games.filter(g=>g.con===id).length;
 const it=(k,l,n,col,ic,tt)=>`<button data-v="${k}" class="${view===k?'on':''}" title="${esc(tt||l)}">${col?`<span class="dot" style="background:${col}"></span>`:IC[ic]}<span class="lb">${esc(l)}</span>${n===undefined?'':`<span class="n mono">${n}</span>`}</button>`;
@@ -319,7 +343,7 @@ const last=games.filter(g=>g.played).sort((a,b)=>b.played-a.played)[0],used=cons
 const row=l=>`<div class="row">${l.slice(0,12).map(card).join('')}</div>`,sec=(t,more,b)=>`<div class="sh"><h2>${t}</h2>${more?`<button class="lnk" data-v="${more}">See all</button>`:''}</div>${b}`;
 el.innerHTML=`<div class="hh"><h1>${hi}${pref.name?', '+esc(pref.name):''}</h1><p class="sub${games.length?' mono':''}" style="margin:4px 0 0">${games.length?`${games.length} game${games.length===1?'':'s'} · ${used.length} console${used.length===1?'':'s'} · ${fmt(games.reduce((a,g)=>a+g.size,0))}`:'Your shelf is empty'}</p></div>`+
 (!games.length?`<div class="empty">${PAD}<h2 style="margin-top:0">Add your first game</h2><p>Drop ROM files here, or pick a file or folder. Everything stays on this device.</p><button class="btn pri" onclick="$('#imp').click()">Import games</button></div><div class="steps"><div><b><i>01</i>Import</b>Pick ROMs or a whole folder. A .cue and its .bin files get packed together.</div><div><b><i>02</i>Cover art</b>Fetched automatically from the libretro library.</div><div><b><i>03</i>Play</b>Progress saves when you quit and resumes next time.</div></div><p class="mono" style="color:var(--mu);font-size:12px;margin-top:16px">Plays in the browser: NES · SNES · Master System · Genesis · Saturn · GB · GBC · GBA · N64 · PS1 · DS</p>`:
-(last?`<div class="cont"><div class="cart">${cover(last)}</div><div class="ci"><span class="mono eyebrow">CONTINUE PLAYING</span><h2>${esc(last.title)}</h2><p class="sub" style="margin:0 0 14px">${esc(con(last.con).name)}${last.state?' · resumes where you left off':''}</p><button class="btn pri" data-play="${last.id}">${IC.played}${last.state?'Resume':'Play'}</button></div></div>`:'')+
+(last?`<div class="cont">${last.cover?`<div class="cbg" style="background-image:url('${last.cover}')"></div>`:''}<div class="cart">${cover(last)}</div><div class="ci"><span class="mono eyebrow">CONTINUE PLAYING</span><h2>${esc(last.title)}</h2><p class="sub" style="margin:0 0 14px">${esc(con(last.con).name)}${last.state?' · resumes where you left off':''}${last.time?' · '+fmtT(last.time)+' played':''}</p><button class="btn pri" data-play="${last.id}">${IC.played}${last.state?'Resume':'Play'}</button></div></div>`:'')+
 sec('Recently added','recent',row(games.slice().sort((a,b)=>b.added-a.added)))+(games.some(g=>g.fav)?sec('Favorites','fav',row(games.filter(g=>g.fav))):'')+
 sec('Browse by console','',`<div class="ct2">${used.map(c=>`<button class="ctile" data-v="c:${c.id}" style="--cc:${c.c}"><b>${esc(c.s)}</b><span>${esc(c.name)}</span><em class="mono">${games.filter(g=>g.con===c.id).length}</em></button>`).join('')}</div>`));if(last)loadShot(last);return}
 const l=filtered(),c=view.startsWith('c:')?con(view.slice(2)):null;
@@ -348,8 +372,8 @@ const l=LS('c_links',[]);if(l.some(x=>x.u===u.href)||DECOMPS.some(x=>x.u===u.hre
 l.push({c:$('#lcat').value,n,u:u.href});SV('c_links',l);d.close();render()};d.showModal()}}
 function settings(el){el.innerHTML=`<h1>Settings</h1><p class="sub">Preferences and library management.</p>
 <h2>Appearance</h2><label><input type="checkbox" id="th" ${pref.theme==='light'?'checked':''}> Light theme</label>
-<p>Accent color</p><div class="sw">${['#34c98a','#a78bfa','#ff4f8b','#ff8a3d','#f2c94c','#3ddc97','#38bdf8','#8b7bff'].map(c=>`<button style="background:${c}" data-ac="${c}" aria-label="Accent ${c}"></button>`).join('')}<input type="color" id="ac" value="${pref.ac}" aria-label="Custom accent"></div>
-<h2>Install app</h2>${ip?'<p class="sub">Install Cartridge as an app with its own window and icon.</p><button class="btn pri" id="ins">Install Cartridge</button>':'<div class="note">To install, open this page over HTTPS (for example GitHub Pages) or localhost. Chrome and Edge then offer Install in the address bar or menu. On iPhone and iPad use Share → Add to Home Screen. If you are already running it as an installed app, you’re all set.</div>'}
+<p>Accent color</p><div class="sw">${['#34c98a','#38bdf8','#a78bfa','#ff4f8b','#ff8a3d','#f2c94c'].map(c=>`<button style="background:${c}" data-ac="${c}" aria-label="Accent ${c}"></button>`).join('')}<input type="color" id="ac" value="${pref.ac}" aria-label="Custom accent"></div>
+<h2>Install app</h2>${ip?'<p class="sub">Install Cartridge as an app with its own window and icon.</p><button class="btn pri" id="ins">Install Cartridge</button>':matchMedia('(display-mode: standalone)').matches?'<div class="note">Cartridge is installed on this device.</div>':'<div class="note">To install, open this page over HTTPS (for example GitHub Pages) or localhost. Chrome and Edge then offer Install in the address bar or menu. On iPhone and iPad use Share → Add to Home Screen. If you are already running it as an installed app, you’re all set.</div>'}
 <h2>Playing</h2><label><input type="checkbox" id="au" ${pref.auto!==false?'checked':''}> Save progress when quitting and resume next time</label><br><label><input type="checkbox" id="ap" ${pref.ap!==false?'checked':''}> Fetch cover art automatically when importing</label><br><label><input type="checkbox" id="fs" ${(pref.fs??matchMedia('(pointer:coarse)').matches)?'checked':''}> Go fullscreen when playing (hides the status and navigation bars)</label><br><label><input type="checkbox" id="crt" ${pref.crt?'checked':''}> CRT screen filter</label><p>Your name (for the greeting)</p><input id="nm" value="${esc(pref.name||'')}" style="max-width:240px">
 <p>3D resolution (N64, PSP)</p><select id="rs2"><option value="1">Native (fastest)</option><option value="2">2× (default)</option><option value="4">4× (needs a strong device)</option></select>
 <h2>Storage</h2><p class="sub mono" id="stor">Checking…</p><div class="bar"><button class="btn" id="pst">Protect library from being cleared</button></div>
@@ -404,9 +428,9 @@ d.innerHTML=`<h2 style="margin-top:0">Import complete: ${ok} of ${files.length} 
 $('#ok').onclick=()=>d.close();d.showModal();if(pref.ap!==false&&added.length)autoCovers(added)}
 
 function details(id){const g=games.find(x=>x.id===id);if(!g)return;const c=con(g.con),d=$('#dlg');
-d.innerHTML=`<div class="dh">${cover(g)}<div style="flex:1;min-width:0"><h2 style="margin:0 0 6px">${esc(g.title)}</h2><p class="sub" style="margin:0 0 8px">${esc(c.name)}</p><p>${esc(g.desc)||'<span style="color:var(--mu)">No description yet — add one with Edit.</span>'}</p>
-<table><tr><td>File</td><td>${esc(g.file)}</td></tr><tr><td>Size</td><td>${fmt(g.size)}</td></tr><tr><td>Added</td><td>${new Date(g.added).toLocaleDateString()}</td></tr><tr><td>Play time</td><td>${fmtT(g.time)}</td></tr><tr><td>Last played</td><td>${g.played?new Date(g.played).toLocaleString():'Never'}</td></tr></table></div></div>
-<div class="acts"><button class="btn" id="fv">${g.fav?'★ Unfavorite':'☆ Favorite'}</button><button class="btn" id="ed">Edit</button><button class="btn dng" id="rm">Remove</button>${g.state?'<button class="btn" id="rs">Reset save state</button>':''}<button class="btn" id="fcv">Find cover</button><button class="btn" id="cx">Close</button><button class="btn pri" id="pl">▶ Play</button></div>`;
+d.innerHTML=`<button class="x" id="cx" aria-label="Close">✕</button><div class="dh"><div class="dc">${cover(g)}</div><div class="di"><h2>${esc(g.title)}</h2><p class="sub" style="margin:0 0 10px">${esc(c.name)}</p><dl class="meta"><dt>Size</dt><dd class="mono">${fmt(g.size)}</dd><dt>Play time</dt><dd class="mono">${fmtT(g.time)}</dd><dt>Last played</dt><dd class="mono">${g.played?new Date(g.played).toLocaleDateString():'Never'}</dd></dl></div></div>${g.desc?`<p class="desc">${esc(g.desc)}</p>`:''}
+<button class="btn pri big" id="pl">${IC.played}${g.state?'Resume':'Play'}</button>
+<div class="tools"><button class="btn" id="fv">${IC.fav}<span>${g.fav?'Unfavorite':'Favorite'}</span></button><button class="btn" id="ed">Edit</button><button class="btn" id="fcv">Find cover</button>${g.state?'<button class="btn" id="rs">Reset save</button>':''}<button class="btn dng" id="rm">Remove</button></div><p class="file mono">${esc(g.file)}</p>`;
 $('#cx').onclick=()=>d.close();
 if(g.state)$('#rs').onclick=async()=>{await tx('states','readwrite',t=>t.objectStore('states').delete(id));g.state=false;await putG(g);toast('Save state cleared.');details(id)};
 $('#fcv').onclick=async()=>{const b=$('#fcv');b.disabled=true;b.textContent='Searching…';try{await setCover(g,await findCover(g));await putG(g);render();details(id);toast('Cover updated.')}catch(e){b.disabled=false;b.textContent='Find cover';msg('Couldn’t find a cover',e.message)}};
@@ -415,12 +439,12 @@ $('#rm').onclick=()=>confirmD(`Remove “${g.title}” from the library? The sto
 $('#ed').onclick=()=>edit(g);$('#pl').onclick=()=>play(g);if(!d.open)d.showModal()}
 function edit(g){const d=$('#dlg'),cur={cover:g.cover};
 d.innerHTML=`<h2 style="margin-top:0">Edit game</h2><label for="et">Title</label><input id="et" value="${esc(g.title)}"><label for="ec">Console</label><select id="ec">${conOpts(g.con)}</select><label for="eds">Description</label><textarea id="eds" rows="3">${esc(g.desc)}</textarea>
-<label>Cover image</label><div class="bar"><button class="btn" id="pc">Choose image…</button><button class="btn" id="rc">Remove cover</button></div>
+<label>Cover image</label><div class="bar"><button class="btn" id="pc">Choose image…</button><button class="btn" id="rc">Remove cover</button></div><label for="eu">…or paste an image link</label><input id="eu" placeholder="https://…" inputmode="url">
 <div class="acts"><button class="btn" id="cn2">Cancel</button><button class="btn pri" id="sv">Save</button></div>`;
 $('#pc').onclick=()=>{$('#fc').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(f.size>3e6)return toast('Cover must be under 3 MB.');const r=new FileReader();r.onload=()=>{cur.cover=r.result;toast('Cover selected — press Save.')};r.readAsDataURL(f)};$('#fc').click()};
 $('#rc').onclick=()=>{cur.cover='';toast('Cover will be removed on save.')};
 $('#cn2').onclick=()=>details(g.id);
-$('#sv').onclick=async()=>{const t=$('#et').value.trim();if(!t)return toast('Title can’t be empty.');Object.assign(g,{title:t,con:$('#ec').value,desc:$('#eds').value.trim()});await setCover(g,cur.cover);await putG(g);render();details(g.id)}}
+$('#sv').onclick=async()=>{const t=$('#et').value.trim();if(!t)return toast('Title can’t be empty.');const eu=$('#eu').value.trim();if(eu){if(!/^https?:\/\//i.test(eu))return toast('Image link must start with http:// or https://');cur.cover=await urlToCover(eu)}Object.assign(g,{title:t,con:$('#ec').value,desc:$('#eds').value.trim()});await setCover(g,cur.cover);await putG(g);render();details(g.id)}}
 
 let pspOk=false;
 async function play(g){const c=con(g.con),ext=(g.file.split('.').pop()||'').toLowerCase(),core=CORE_X[ext]||c.core;
