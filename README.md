@@ -1,14 +1,12 @@
 # Cartridge
 
-<img width="592" height="421" alt="Image" src="https://github.com/user-attachments/assets/94a7cbce-fe6e-4a0a-bd85-7ef93d0326e4" />
+<img width="1869" height="1007" alt="Image" src="https://github.com/user-attachments/assets/66833267-231b-433b-92d0-46f552697511" />
 
 https://katsantonis-archdaemon.github.io/Cartridge/
 
 A private retro game library and launcher that lives in a website. Import the ROMs you own, organize them by console, fetch box art automatically, and play right in the browser, on desktop or mobile.
 
 No server, no account, no build step. Your files never leave your device.
-
-<img width="1869" height="1007" alt="Image" src="https://github.com/user-attachments/assets/66833267-231b-433b-92d0-46f552697511" />
 
 > **Legal:** Cartridge ships with no games, BIOS files, or ROM downloads. It is for games you legally own. You supply your own files.
 
