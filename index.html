@@ -174,6 +174,12 @@ dialog .x{position:absolute;right:10px;top:10px;width:36px;height:36px;padding:0
 #content label{display:flex;gap:12px;align-items:flex-start;padding:9px 0;font-size:15px;line-height:1.35}
 #content br{display:none}
 #content input[type=checkbox]{width:20px;height:20px;margin:1px 0 0;flex:none}
+:root[data-theme=light] .cbg{filter:blur(30px) saturate(1.1);opacity:.3}
+.hz{width:130px!important;display:flex;gap:8px;align-items:flex-start}.hz .xq+.xq{margin-left:0}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:10px;max-height:55vh;overflow:auto}
+.th{padding:0;border:1px solid var(--ln);border-radius:8px;overflow:hidden;background:#000}
+.th img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;image-rendering:pixelated}
+.bigshot{display:block;width:100%;border-radius:8px;image-rendering:pixelated;margin-top:28px;max-height:60vh;object-fit:contain;background:#000}
 body{height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 aside{padding-top:env(safe-area-inset-top)}
 header{padding-top:max(12px,env(safe-area-inset-top))}
@@ -291,23 +297,37 @@ const names=[...(await q.text()).matchAll(/FILE\s+"([^"]+)"/gi)].map(m=>m[1].spl
 if(!bins.length)continue;toast('Packing '+q.name+'…');const f=new File([await makeZip([q,...bins])],q.name.replace(/\.cue$/i,'')+'.zip',{type:'application/zip'});f._con='ps1';out=out.filter(x=>x!==q&&!bins.includes(x));out.push(f)}return out}
 const fmtT=ms=>!ms?'—':ms<6e4?'under a minute':ms<36e5?Math.round(ms/6e4)+' min':(ms/36e5).toFixed(1)+' h';
 function addTime(){if(EMU&&EMU.t0){EMU.g.time=(EMU.g.time||0)+Math.min(Date.now()-EMU.t0,432e5);EMU.t0=Date.now();putG(EMU.g)}}
-const loadShot=g=>getSt('shot:'+g.id).then(b=>{const c=$('.cart');if(b&&c){c.classList.add('wide');c.innerHTML=`<img class="shot" alt="" src="${URL.createObjectURL(b)}">`}});
 let EMU=null;
 function goFS(){if(!(pref.fs??matchMedia('(pointer:coarse)').matches))return;const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{const r=f&&f.call(e,{navigationUI:'hide'});r&&r.catch&&r.catch(()=>{})}catch{}}
 function outFS(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch{}}
 const getSt=id=>new Promise(r=>{try{const q=db.transaction('states').objectStore('states').get(id);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
+const SSK=id=>IDBKeyRange.bound('ss:'+id+':','ss:'+id+':\uffff');
+const listShots=id=>new Promise(r=>{try{const q=db.transaction('states').objectStore('states').getAllKeys(SSK(id));q.onsuccess=()=>r(q.result);q.onerror=()=>r([])}catch{r([])}});
+async function takeShot(){if(!EMU)return;const g=EMU.g;let b=null;try{b=await grabShot(EMU.w.querySelector('iframe').contentWindow.EJS_emulator)}catch{}
+if(!b)return toast('Couldn’t capture a screenshot.');
+try{await tx('states','readwrite',t=>t.objectStore('states').put(b,'ss:'+g.id+':'+Date.now()));toast('Screenshot saved.')}catch{toast('Couldn’t save the screenshot. Storage may be full.')}}
+async function gallery(g){const d=$('#dlg'),keys=(await listShots(g.id)).reverse(),urls=[];
+const items=await Promise.all(keys.map(async k=>{const b=await getSt(k);if(!b)return '';const u=URL.createObjectURL(b);urls.push(u);return `<button class="th" data-k="${esc(k)}" aria-label="Open screenshot"><img src="${u}" alt="" loading="lazy"></button>`}));
+const free=()=>urls.forEach(u=>URL.revokeObjectURL(u));
+d.innerHTML=`<button class="x" id="cx" aria-label="Close">✕</button><h2 style="margin-top:0">Screenshots</h2><p class="sub">${esc(g.title)} · ${keys.length}</p>${keys.length?`<div class="gal">${items.join('')}</div>`:`<p class="desc">No screenshots yet. During a game, tap the top-left corner and press the camera button.</p>`}<div class="acts"><button class="btn" id="gb">Back</button></div>`;
+$('#cx').onclick=()=>{free();d.close()};$('#gb').onclick=()=>{free();details(g.id)};
+d.querySelectorAll('.th').forEach(b=>b.onclick=()=>viewShot(g,b.dataset.k,b.querySelector('img').src));if(!d.open)d.showModal()}
+function viewShot(g,k,src){const d=$('#dlg');d.innerHTML=`<button class="x" id="cx" aria-label="Close">✕</button><img class="bigshot" src="${src}" alt="Screenshot"><div class="acts"><button class="btn" id="gb">Back</button><button class="btn" id="sd">Download</button><button class="btn dng" id="sr">Delete</button></div>`;
+$('#cx').onclick=()=>d.close();$('#gb').onclick=()=>gallery(g);
+$('#sd').onclick=()=>{const a=document.createElement('a');a.href=src;a.download=(g.title.replace(/[^\w\- ]+/g,'')||'screenshot')+'-'+k.split(':').pop()+'.png';a.click()};
+$('#sr').onclick=()=>confirmD('Delete this screenshot?',async()=>{await tx('states','readwrite',t=>t.objectStore('states').delete(k));gallery(g)})}
 async function grabShot(em){
-const api=()=>new Promise(res=>{try{if(typeof em.screenshot!=='function')return res(null);const t=setTimeout(()=>res(null),2500);em.screenshot(b=>{clearTimeout(t);res(b instanceof Blob?b:(b&&b.length?new Blob([b],{type:'image/png'}):null))},'canvas','jpeg',1)}catch{res(null)}});
+const api=()=>new Promise(res=>{try{if(typeof em.screenshot!=='function')return res(null);const t=setTimeout(()=>res(null),2500);em.screenshot(b=>{clearTimeout(t);res(b instanceof Blob?b:(b&&b.length?new Blob([b],{type:'image/png'}):null))},'canvas','png',1)}catch{res(null)}});
 let b=await api();if(b)return b;
 try{const gm=em.gameManager.screenshot&&em.gameManager.screenshot();if(gm&&gm.length)return new Blob([gm],{type:'image/png'})}catch{}
-try{const cv=EMU.w.querySelector('iframe').contentDocument.querySelector('canvas');if(cv)return await new Promise(r=>cv.toBlob(r,'image/jpeg',.8))}catch{}
+try{const cv=EMU.w.querySelector('iframe').contentDocument.querySelector('canvas');if(cv)return await new Promise(r=>cv.toBlob(r,'image/png'))}catch{}
 return null}
 async function saveState(){if(!EMU)return false;const {g,w}=EMU;try{const em=w.querySelector('iframe').contentWindow.EJS_emulator,st=em&&em.gameManager&&em.gameManager.getState();
-if(st&&st.length){await tx('states','readwrite',t=>t.objectStore('states').put(new Blob([st]),g.id));if(!g.state){g.state=true;await putG(g)}try{const sb=await grabShot(em);if(sb)await tx('states','readwrite',t=>t.objectStore('states').put(sb,'shot:'+g.id))}catch{}return true}}catch(e){}return false}
+if(st&&st.length){await tx('states','readwrite',t=>t.objectStore('states').put(new Blob([st]),g.id));if(!g.state){g.state=true;await putG(g)}return true}}catch(e){}return false}
 const resOpts=core=>{const r=pref.res||2;if(core==='n64')return{'mupen64plus-43screensize':{1:'320x240',2:'640x480',4:'1280x960'}[r]};if(core==='psp')return{'ppsspp_internal_resolution':{1:'480x272',2:'960x544',4:'1920x1088'}[r]};return{}};
 document.addEventListener('visibilitychange',()=>{if(!EMU)return;if(document.hidden){addTime();EMU.t0=null;if(pref.auto!==false)saveState()}else EMU.t0=Date.now()});
 const mk=p=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
-const IC={home:mk('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'),all:mk('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),fav:mk('<path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.5A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/>'),recent:mk('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),played:mk('<path d="M7 4l13 8-13 8z"/>'),web:mk('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'),set:mk('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'),rnd:mk('<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>'),plus:mk('<path d="M12 5v14M5 12h14"/>')};
+const IC={home:mk('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'),all:mk('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),fav:mk('<path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.5A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/>'),recent:mk('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),played:mk('<path d="M7 4l13 8-13 8z"/>'),web:mk('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'),set:mk('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'),rnd:mk('<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>'),plus:mk('<path d="M12 5v14M5 12h14"/>'),cam:mk('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>')};
 const PAD='<svg class="pad" viewBox="0 0 160 104" aria-hidden="true"><g style="fill:none;stroke:var(--ac);stroke-width:5;stroke-linecap:round"><path d="M36 28C40 17 56 14 66 20"/><path d="M124 28C120 17 104 14 94 20"/></g><path d="M52 22H108C122 22 130 28 134 40L146 74C150 88 142 96 132 96C124 96 120 90 115 82C112 77 108 74 102 74H58C52 74 48 77 45 82C40 90 36 96 28 96C18 96 10 88 14 74L26 40C30 28 38 22 52 22Z" style="fill:var(--card);stroke:var(--ac);stroke-width:2.5;stroke-linejoin:round"/><g style="fill:none;stroke:var(--mu);stroke-width:2.5"><circle cx="46" cy="42" r="7"/><circle cx="96" cy="62" r="7"/></g><g style="fill:var(--mu)"><circle cx="46" cy="42" r="2.5"/><circle cx="96" cy="62" r="2.5"/><rect x="56.5" y="58.5" width="15" height="7" rx="2"/><rect x="60.5" y="54.5" width="7" height="15" rx="2"/><circle cx="106" cy="42" r="4.2"/><circle cx="114" cy="50" r="4.2"/><rect x="67" y="39" width="8" height="3" rx="1.5"/><rect x="85" y="39" width="8" height="3" rx="1.5"/></g><g style="fill:var(--ac)"><circle cx="114" cy="34" r="4.2"/><circle cx="122" cy="42" r="4.2"/><circle cx="80" cy="31" r="3.5"/></g></svg>';
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3500)};
 function theme(){document.documentElement.dataset.theme=pref.theme;document.documentElement.style.setProperty('--ac',pref.ac)}
@@ -345,7 +365,7 @@ el.innerHTML=`<div class="hh"><h1>${hi}${pref.name?', '+esc(pref.name):''}</h1><
 (!games.length?`<div class="empty">${PAD}<h2 style="margin-top:0">Add your first game</h2><p>Drop ROM files here, or pick a file or folder. Everything stays on this device.</p><button class="btn pri" onclick="$('#imp').click()">Import games</button></div><div class="steps"><div><b><i>01</i>Import</b>Pick ROMs or a whole folder. A .cue and its .bin files get packed together.</div><div><b><i>02</i>Cover art</b>Fetched automatically from the libretro library.</div><div><b><i>03</i>Play</b>Progress saves when you quit and resumes next time.</div></div><p class="mono" style="color:var(--mu);font-size:12px;margin-top:16px">Plays in the browser: NES · SNES · Master System · Genesis · Saturn · GB · GBC · GBA · N64 · PS1 · DS</p>`:
 (last?`<div class="cont">${last.cover?`<div class="cbg" style="background-image:url('${last.cover}')"></div>`:''}<div class="cart">${cover(last)}</div><div class="ci"><span class="mono eyebrow">CONTINUE PLAYING</span><h2>${esc(last.title)}</h2><p class="sub" style="margin:0 0 14px">${esc(con(last.con).name)}${last.state?' · resumes where you left off':''}${last.time?' · '+fmtT(last.time)+' played':''}</p><button class="btn pri" data-play="${last.id}">${IC.played}${last.state?'Resume':'Play'}</button></div></div>`:'')+
 sec('Recently added','recent',row(games.slice().sort((a,b)=>b.added-a.added)))+(games.some(g=>g.fav)?sec('Favorites','fav',row(games.filter(g=>g.fav))):'')+
-sec('Browse by console','',`<div class="ct2">${used.map(c=>`<button class="ctile" data-v="c:${c.id}" style="--cc:${c.c}"><b>${esc(c.s)}</b><span>${esc(c.name)}</span><em class="mono">${games.filter(g=>g.con===c.id).length}</em></button>`).join('')}</div>`));if(last)loadShot(last);return}
+sec('Browse by console','',`<div class="ct2">${used.map(c=>`<button class="ctile" data-v="c:${c.id}" style="--cc:${c.c}"><b>${esc(c.s)}</b><span>${esc(c.name)}</span><em class="mono">${games.filter(g=>g.con===c.id).length}</em></button>`).join('')}</div>`));return}
 const l=filtered(),c=view.startsWith('c:')?con(view.slice(2)):null;
 const title=c?c.name:{all:'All games',fav:'Favorites',recent:'Recently added',played:'Recently played',home:'Search results'}[view];
 const chips=(view==='all'||view.startsWith('c:'))?`<div class="chips"><button class="chip ${view==='all'?'on':''}" data-v="all">All</button>${cons().filter(x=>games.some(g=>g.con===x.id)).map(x=>`<button class="chip ${view==='c:'+x.id?'on':''}" data-v="c:${x.id}">${esc(x.s)}</button>`).join('')}</div>`:'';
@@ -430,12 +450,13 @@ $('#ok').onclick=()=>d.close();d.showModal();if(pref.ap!==false&&added.length)au
 function details(id){const g=games.find(x=>x.id===id);if(!g)return;const c=con(g.con),d=$('#dlg');
 d.innerHTML=`<button class="x" id="cx" aria-label="Close">✕</button><div class="dh"><div class="dc">${cover(g)}</div><div class="di"><h2>${esc(g.title)}</h2><p class="sub" style="margin:0 0 10px">${esc(c.name)}</p><dl class="meta"><dt>Size</dt><dd class="mono">${fmt(g.size)}</dd><dt>Play time</dt><dd class="mono">${fmtT(g.time)}</dd><dt>Last played</dt><dd class="mono">${g.played?new Date(g.played).toLocaleDateString():'Never'}</dd></dl></div></div>${g.desc?`<p class="desc">${esc(g.desc)}</p>`:''}
 <button class="btn pri big" id="pl">${IC.played}${g.state?'Resume':'Play'}</button>
-<div class="tools"><button class="btn" id="fv">${IC.fav}<span>${g.fav?'Unfavorite':'Favorite'}</span></button><button class="btn" id="ed">Edit</button><button class="btn" id="fcv">Find cover</button>${g.state?'<button class="btn" id="rs">Reset save</button>':''}<button class="btn dng" id="rm">Remove</button></div><p class="file mono">${esc(g.file)}</p>`;
+<div class="tools"><button class="btn" id="fv">${IC.fav}<span>${g.fav?'Unfavorite':'Favorite'}</span></button><button class="btn" id="ed">Edit</button><button class="btn" id="gal">Screenshots</button><button class="btn" id="fcv">Find cover</button>${g.state?'<button class="btn" id="rs">Reset save</button>':''}<button class="btn dng" id="rm">Remove</button></div><p class="file mono">${esc(g.file)}</p>`;
 $('#cx').onclick=()=>d.close();
 if(g.state)$('#rs').onclick=async()=>{await tx('states','readwrite',t=>t.objectStore('states').delete(id));g.state=false;await putG(g);toast('Save state cleared.');details(id)};
 $('#fcv').onclick=async()=>{const b=$('#fcv');b.disabled=true;b.textContent='Searching…';try{await setCover(g,await findCover(g));await putG(g);render();details(id);toast('Cover updated.')}catch(e){b.disabled=false;b.textContent='Find cover';msg('Couldn’t find a cover',e.message)}};
+$('#gal').onclick=()=>gallery(g);
 $('#fv').onclick=async()=>{g.fav=!g.fav;await putG(g);render();details(id)};
-$('#rm').onclick=()=>confirmD(`Remove “${g.title}” from the library? The stored copy is deleted from this browser; your original file is untouched.`,async()=>{await tx(['games','roms','states'],'readwrite',t=>{t.objectStore('games').delete(id);t.objectStore('roms').delete(id);t.objectStore('states').delete(id);t.objectStore('states').delete('shot:'+id)});games=games.filter(x=>x.id!==id);render();toast('Game removed.')});
+$('#rm').onclick=()=>confirmD(`Remove “${g.title}” from the library? The stored copy is deleted from this browser; your original file is untouched.`,async()=>{await tx(['games','roms','states'],'readwrite',t=>{t.objectStore('games').delete(id);t.objectStore('roms').delete(id);t.objectStore('states').delete(id);t.objectStore('states').delete(SSK(id))});games=games.filter(x=>x.id!==id);render();toast('Game removed.')});
 $('#ed').onclick=()=>edit(g);$('#pl').onclick=()=>play(g);if(!d.open)d.showModal()}
 function edit(g){const d=$('#dlg'),cur={cover:g.cover};
 d.innerHTML=`<h2 style="margin-top:0">Edit game</h2><label for="et">Title</label><input id="et" value="${esc(g.title)}"><label for="ec">Console</label><select id="ec">${conOpts(g.con)}</select><label for="eds">Description</label><textarea id="eds" rows="3">${esc(g.desc)}</textarea>
@@ -458,13 +479,13 @@ if(!blob)return msg('ROM file not found','The stored copy is missing, likely bec
 g.played=Date.now();putG(g);$('#dlg').close();
 let sUrl='';if(pref.auto!==false&&g.state){const sb=await getSt(g.id);if(sb)sUrl=URL.createObjectURL(sb)}
 const url=URL.createObjectURL(blob),w=document.createElement('div');w.id='emu';
-w.innerHTML=`<div class="hz" id="hz"><button class="xq" id="eq" aria-label="Quit game">✕</button></div><iframe title="Emulator" allow="fullscreen; gamepad; autoplay; cross-origin-isolated"></iframe>`;
+w.innerHTML=`<div class="hz" id="hz"><button class="xq" id="eq" aria-label="Quit game">✕</button><button class="xq" id="es" aria-label="Take screenshot">${IC.cam}</button></div><iframe title="Emulator" allow="fullscreen; gamepad; autoplay; cross-origin-isolated"></iframe>`;
 const hz=w.querySelector('#hz');hz.onclick=e=>{if(e.target.closest('.xq'))return;hz.classList.add('show');clearTimeout(hz.t);hz.t=setTimeout(()=>hz.classList.remove('show'),3500)};
 
 document.body.appendChild(w);
 const base=new URL((SG().ejs||'https://cdn.emulatorjs.org/stable/data/').replace(/\/?$/,'/'),location.href).href;
 w.querySelector('iframe').srcdoc=`<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;height:100%;overflow:hidden;background:#000;overscroll-behavior:none}#game{width:100%;height:100%}</style><body><div id="game"></div><script>EJS_player='#game';EJS_core=${JSON.stringify(core)};EJS_gameUrl=${JSON.stringify(url)};EJS_gameName=${JSON.stringify(g.title)};EJS_pathtodata=${JSON.stringify(base)};EJS_startOnLoaded=true;EJS_color='#34c98a';EJS_defaultOptions=${JSON.stringify(Object.assign(resOpts(core),pref.crt?{shader:'crt-easymode.glslp'}:{}))};${sUrl?'EJS_loadStateURL='+JSON.stringify(sUrl)+';':''}<\/script><script src="${base}loader.js" onerror="document.body.innerHTML='<p style=color:#fff;font-family:sans-serif;padding:20px>Couldn’t load the emulator files from ${base}. Check your connection or the emulator path in Settings.</p>'"><\/script></body>`;
-EMU={g,w,t0:Date.now()};$('#eq').onclick=async()=>{$('#eq').disabled=true;let ok=false;if(pref.auto!==false)ok=await saveState();addTime();w.remove();outFS();EMU=null;URL.revokeObjectURL(url);if(sUrl)URL.revokeObjectURL(sUrl);render();if(ok)toast('Progress saved. It resumes next time.')};render()}
+EMU={g,w,t0:Date.now()};$('#es').onclick=takeShot;$('#eq').onclick=async()=>{$('#eq').disabled=true;let ok=false;if(pref.auto!==false)ok=await saveState();addTime();w.remove();outFS();EMU=null;URL.revokeObjectURL(url);if(sUrl)URL.revokeObjectURL(sUrl);render();if(ok)toast('Progress saved. It resumes next time.')};render()}
 function msg(t,m){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">${esc(t)}</h2><p>${esc(m)}</p><div class="acts"><button class="btn pri" id="ok">OK</button></div>`;$('#ok').onclick=()=>d.close();if(!d.open)d.showModal()}
 
 document.addEventListener('click',e=>{if(!e.target.closest('#side,#tg'))$('#side').classList.remove('open');const pb=e.target.closest('[data-play]');if(pb){const g=games.find(x=>x.id===pb.dataset.play);if(g)play(g);return}const v=e.target.closest('[data-v]');if(v){view=v.dataset.v;$('#q').value='';$('#side').classList.remove('open');render();$('#content').scrollTop=0;return}
@@ -480,7 +501,7 @@ document.addEventListener('drop',e=>{if(e.dataTransfer.files.length)addFiles(e.d
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}});
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').then(r=>{r.onupdatefound=()=>{const n=r.installing;n&&n.addEventListener('statechange',()=>{if(n.state==='installed'&&navigator.serviceWorker.controller)toast('Update ready. Reload to use the new version.')})}}).catch(()=>{});
 let ip=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;if(view==='set')render()});addEventListener('appinstalled',()=>{ip=null;if(view==='set')render()});
-(async()=>{theme();try{db=await openDB();games=await tx('games','readonly',t=>t.objectStore('games').getAll())}catch(e){toast('Browser storage is unavailable, so the library can’t be saved in this window.');db=null}
+(async()=>{theme();try{db=await openDB();games=await tx('games','readonly',t=>t.objectStore('games').getAll());tx('states','readwrite',t=>t.objectStore('states').delete(IDBKeyRange.bound('shot:','shot:\uffff'))).catch(()=>{})}catch(e){toast('Browser storage is unavailable, so the library can’t be saved in this window.');db=null}
 if(!db){db={transaction(){throw new Error('no db')}}}
 render();backfill()})();
 </script>
