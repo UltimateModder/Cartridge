@@ -1,6 +1,6 @@
 # Cartridge
 
-<img width="1869" height="1007" alt="Image" src="https://github.com/user-attachments/assets/66833267-231b-433b-92d0-46f552697511" />
+<img width="1919" height="1079" alt="Image" src="https://github.com/user-attachments/assets/400fccf0-3a80-458d-ad9d-5a27a8b7e317" />
 
 https://katsantonis-archdaemon.github.io/Cartridge/
 
