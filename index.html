@@ -47,21 +47,10 @@ header{display:flex;gap:10px;align-items:center;padding:12px 20px;border-bottom:
 .pri{background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 35%,#7dd3fc));border-color:transparent;color:#12102a;font-weight:700;box-shadow:0 4px 20px -4px var(--ac)}
 .dng{border-color:#d33;color:#ff6b6b}
 #q{flex:1;min-width:140px;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239a98b8' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 4 4'/%3E%3C/svg%3E") no-repeat 14px center;border:1px solid var(--ln);border-radius:12px;padding:10px 14px 10px 38px}
-.hero{position:relative;overflow:hidden;display:flex;justify-content:space-between;gap:20px;padding:36px;border-radius:24px;border:1px solid var(--ln);background:radial-gradient(circle at 85% 0%,color-mix(in srgb,var(--ac) 30%,transparent),transparent 45%),var(--card);margin-bottom:16px}
-.eye{color:#5ee9f5;font-size:12px;letter-spacing:.18em;font-weight:700;margin:0 0 14px}
-.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px}
-.hp{color:var(--mu);max-width:460px;margin:0 0 20px}
-.big{text-align:right;flex:none}.big b{font-size:44px;display:block}.big span{font-size:12px;letter-spacing:.15em;color:var(--mu)}
-.sts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:8px}
-.sts .stat{padding:16px 18px}.sts .top{display:flex;justify-content:space-between;color:var(--mu);font-size:13px}.sts b{font-size:28px;margin:14px 0 4px}.sts small{color:var(--mu)}
-@media(max-width:760px){.hero{flex-direction:column;padding:24px}.big{text-align:left}}
 #content{flex:1;overflow:auto;padding:20px;position:relative}
 h1{margin:0 0 4px;font-size:28px}
 h2{margin:26px 0 10px;font-size:18px}
 .sub{color:var(--mu);margin:0 0 16px}
-.stats{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
-.stat{background:var(--card);border:1px solid var(--ln);border-radius:var(--r);padding:12px 18px;min-width:130px}
-.stat b{font-size:26px;display:block}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .bar select,.bar .btn{padding:7px 10px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;align-items:start}
@@ -148,7 +137,9 @@ nav .lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:no
 :root:not([data-theme=light]) .lm{filter:drop-shadow(0 0 1px rgba(255,255,255,.5))}
 aside.min .logo{justify-content:center;padding-left:0;padding-right:0}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-#q{max-width:560px}#rnd{margin-left:auto}
+.qw{position:relative;flex:1;min-width:140px;max-width:560px}.qw #q{width:100%;max-width:none}.qx{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:6px;background:none;color:var(--mu);font-size:14px;padding:0}.qx:hover{color:var(--tx)}
+#rnd{margin-left:auto}
+#q::-webkit-search-cancel-button{display:none}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px}
 .steps div{border:1px solid var(--ln);border-radius:8px;padding:12px 14px;background:var(--bg2);font-size:13px;color:var(--mu)}
 .steps b{display:block;color:var(--tx);margin-bottom:3px;font-size:14px}.steps i{font-style:normal;color:var(--ac);font-family:ui-monospace,Menlo,Consolas,monospace;margin-right:8px}
@@ -191,6 +182,19 @@ dialog .x{position:absolute;right:10px;top:10px;width:36px;height:36px;padding:0
 .pb{width:44px;height:44px;border-radius:50%;border:0;background:transparent;color:#fff;display:grid;place-items:center}.pb:hover,.pb:active{background:#fff2}
 .slots{display:none;align-items:center;gap:6px;padding:2px 8px 6px;color:#d6e5dc;font-size:12px}.hz.sl .slots{display:flex}.slots span{flex:1;white-space:nowrap;margin-right:4px}
 .slots button{min-width:40px;height:34px;border-radius:17px;border:1px solid #fff4;background:none;color:#fff;font:inherit;font-size:14px}.slots .full{background:var(--ac);color:#04140d;border-color:transparent}
+[hidden]{display:none!important}
+#prog{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;width:min(420px,92vw);background:var(--bg2);border:1px solid var(--ln);border-radius:12px;padding:12px 14px;z-index:98;box-shadow:0 10px 30px -10px #000}
+#prog .pt{display:flex;align-items:center;justify-content:space-between;gap:10px}#prog .btn{padding:4px 12px;min-height:0}
+.pbar{height:6px;background:var(--ln);border-radius:3px;overflow:hidden;margin:10px 0 6px}.pbar i{display:block;height:100%;width:0;background:var(--ac);transition:width .2s}
+#prog small{color:var(--mu);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:760px){#prog{bottom:calc(84px + env(safe-area-inset-bottom))}}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:12px;max-height:48vh;overflow:auto}
+.cgrid h3{grid-column:1/-1;margin:8px 0 0;font-size:12px;color:var(--mu);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.cc{padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:var(--card);text-align:left}.cc:hover{border-color:var(--ac)}.cc.cur{border-color:var(--ac)}
+.cc img{display:block;width:100%;height:128px;object-fit:contain;background:#000}.cc span{display:block;font-size:11px;color:var(--mu);padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#content[data-size=s] .grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+#content[data-size=l] .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+@media(max-width:760px){#content[data-size=s] .grid{grid-template-columns:repeat(3,1fr);gap:8px}#content[data-size=l] .grid{grid-template-columns:1fr}.bar select{flex:1 1 auto}}
 body{height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 aside{padding-top:env(safe-area-inset-top)}
 header{padding-top:max(12px,env(safe-area-inset-top))}
@@ -203,7 +207,6 @@ header .btn{min-width:44px;padding:8px 12px}.tx{display:none}
 #content{padding:16px 14px calc(78px + env(safe-area-inset-bottom))}
 h1{font-size:24px}
 .grid{grid-template-columns:repeat(2,1fr);gap:12px}.row .card{width:132px}
-.stat{min-width:0;flex:1 1 40%}
 #bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--bg2);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom)}
 #bnav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px}
 #bnav button span{font-size:20px}
@@ -222,7 +225,7 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:20px 20px 0 0;m
 <main>
 <header>
 <button class="btn" id="tg" aria-label="Toggle sidebar">☰</button>
-<input id="q" type="search" placeholder="Search your library…" aria-label="Search">
+<div class="qw"><input id="q" type="search" placeholder="Search your library…" aria-label="Search"><button id="qx" class="qx" aria-label="Clear search" hidden>✕</button></div>
 <button class="btn" id="rnd" aria-label="Random game"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span class="tx"> Random</span></button>
 <button class="btn pri" id="imp" aria-label="Import games"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span class="tx"> Import games</span></button>
 </header>
@@ -234,6 +237,7 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:20px 20px 0 0;m
 <div id="bnav" role="navigation" aria-label="Quick navigation"></div>
 <dialog id="dlg"></dialog>
 <div id="toast" role="status"></div>
+<div id="prog" role="status" hidden><div class="pt"><b id="ipt">Working…</b><button class="btn" id="ipc">Cancel</button></div><div class="pbar"><i id="ipf"></i></div><small id="ips"></small></div>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -273,32 +277,52 @@ const LR={nes:'Nintendo - Nintendo Entertainment System',snes:'Nintendo - Super 
 const LRX={gbc:'Nintendo - Game Boy Color',gg:'Sega - Game Gear',a78:'Atari - 7800',lnx:'Atari - Lynx',j64:'Atari - Jaguar',a52:'Atari - 5200'};
 const imgOk=u=>new Promise(r=>{const i=new Image();const t=setTimeout(()=>r(false),8000);i.onload=()=>{clearTimeout(t);r(true)};i.onerror=()=>{clearTimeout(t);r(false)};i.src=u});
 const enc=n=>encodeURIComponent(n).replace(/\(/g,'%28').replace(/\)/g,'%29');
-async function lrCover(g){const ext=(g.file.split('.').pop()||'').toLowerCase(),sys=LRX[ext]||LR[g.con];if(!sys)return null;
+async function lrList(g,q,snaps){const ext=(g.file.split('.').pop()||'').toLowerCase(),sys=LRX[ext]||LR[g.con];if(!sys)return [];
 const RG=['(USA)','(Europe)','(Japan)','(World)','(USA, Europe)','(Japan, USA)','(Europe, Australia)','(USA, Australia)'],names=[];
-for(const base of [norm(g.file),clean(g.file)]){const m=base.match(/^[^(]*\([^)]*\)/);names.push(base);if(m&&m[0]!==base)names.push(m[0].trim());if(!base.includes('('))RG.forEach(r=>names.push(base+' '+r))}
-const uniq=[...new Set(names)];
-for(const dir of ['Named_Boxarts','Named_Titles']){const urls=uniq.map(n=>'https://thumbnails.libretro.com/'+enc(sys)+'/'+dir+'/'+enc(n.replace(/[&*\/:`<>?\\|]/g,'_'))+'.png'),ok=await Promise.all(urls.map(imgOk)),i=ok.indexOf(true);
-if(i>=0){const u=urls[i];try{const b=await (await fetch(u)).blob();if(b.size<3e6)return await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)})}catch{}return u}}return null}
+for(const base of (q?[q.trim()]:[norm(g.file),clean(g.file)])){const m=base.match(/^[^(]*\([^)]*\)/);names.push(base);if(m&&m[0]!==base)names.push(m[0].trim());if(!base.includes('('))RG.forEach(r=>names.push(base+' '+r))}
+const uniq=[...new Set(names)],out=[],dirs=[['Named_Boxarts','Box art'],['Named_Titles','Title screen']].concat(snaps?[['Named_Snaps','In-game']]:[]);
+for(const [dir,kind] of dirs){const urls=uniq.map(n=>'https://thumbnails.libretro.com/'+enc(sys)+'/'+dir+'/'+enc(n.replace(/[&*\/:`<>?\\|]/g,'_'))+'.png'),ok=await Promise.all(urls.map(imgOk));ok.forEach((o,i)=>{if(o)out.push({u:urls[i],kind})})}
+return out}
+async function lrCover(g){const l=await lrList(g);return l.length?urlToCover(l[0].u):null}
+async function sgList(q){try{const r=await sgFetch('/search/autocomplete/'+encodeURIComponent(q));if(!r||!r.length)return {items:[],hint:'SteamGridDB found no game with that name.'};const items=[];
+for(const gm of r.slice(0,3)){const l=await sgFetch('/grids/game/'+gm.id+'?types=static');for(const x of (l||[]).slice(0,8))items.push({u:x.url,t:x.thumb||x.url,kind:gm.name})}
+return {items:items.slice(0,18),hint:''}}catch(e){return {items:[],hint:e.message}}}
+async function coverPicker(g){const d=$('#dlg');
+d.innerHTML=`<button class="x" id="cx" aria-label="Close">✕</button><h2 style="margin-top:0">Choose cover art</h2><p class="sub">The best match is picked automatically on import. Pick another here if you prefer.</p><div class="bar"><input id="cq" value="${esc(g.title)}" placeholder="Search by game name" style="flex:1;min-width:0"><button class="btn pri" id="cs">Search</button></div><div id="cres" class="cgrid"></div><div class="acts"><button class="btn" id="cf">Upload image…</button><button class="btn" id="cr">Remove cover</button><button class="btn" id="cb">Back</button></div>`;
+$('#cx').onclick=()=>d.close();$('#cb').onclick=()=>details(g.id);
+const apply=async src=>{toast('Applying…');await setCover(g,src);await putG(g);render();details(g.id);toast('Cover updated.')};
+$('#cr').onclick=()=>apply('');
+$('#cf').onclick=()=>{$('#fc').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(f.size>6e6)return toast('Image must be under 6 MB.');const r=new FileReader();r.onload=()=>apply(r.result);r.readAsDataURL(f)};$('#fc').click()};
+const cc=(u,t,k)=>`<button class="cc" data-u="${esc(u)}"><img src="${esc(t)}" alt="" loading="lazy"><span>${esc(k)}</span></button>`,hint=(t)=>`<p class="sub" style="grid-column:1/-1">${esc(t)}</p>`;
+let run=0;const go=async()=>{const qq=$('#cq').value.trim(),res=$('#cres'),my=++run;if(!qq)return;res.innerHTML=hint('Searching…');
+const [lr,sg]=await Promise.all([lrList(g,qq===g.title?'':qq,true),SG().key?sgList(qq):Promise.resolve({items:[],hint:'Add a SteamGridDB key in Settings to see more options.'})]);if(my!==run)return;
+let h=g.cover?`<h3>Current</h3><button class="cc cur" disabled><img src="${esc(g.cover)}" alt=""><span>Current</span></button>`:'';
+if(lr.length)h+=`<h3>Libretro</h3>`+lr.map(x=>cc(x.u,x.u,x.kind)).join('');
+if(sg.items.length)h+=`<h3>SteamGridDB</h3>`+sg.items.map(x=>cc(x.u,x.t,x.kind)).join('');
+if(!lr.length&&!sg.items.length)h+=hint('No matches. Try a shorter name, or upload your own image.');
+if(sg.hint)h+=hint(sg.hint);res.innerHTML=h;
+res.querySelectorAll('.cc[data-u]').forEach(b=>b.onclick=async()=>apply(await urlToCover(b.dataset.u)))};
+$('#cs').onclick=go;$('#cq').onkeydown=e=>{if(e.key==='Enter')go()};go()}
 async function findCover(g){const a=await lrCover(g);if(a)return a;return sgCover(g)}
 async function sgCover(g){if(!SG().key)throw new Error('No match in the free libretro library, and no SteamGridDB key is set in Settings. Rename the file to its standard No-Intro name, or add a key.');
 const r=await sgFetch('/search/autocomplete/'+encodeURIComponent(g.title));if(!r||!r.length)throw new Error('No match on SteamGridDB for “'+g.title+'”. Try editing the title.');
 let l=await sgFetch('/grids/game/'+r[0].id+'?dimensions=600x900&types=static');if(!l||!l.length)l=await sgFetch('/grids/game/'+r[0].id+'?types=static');
 if(!l||!l.length)throw new Error('SteamGridDB has no cover art for “'+r[0].name+'”.');
 const url=l[0].url;try{const b=await (await fetch(url)).blob();if(b.size<3e6)return await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(b)})}catch{}return url}
-const APP_VERSION='1.2.0',APP_BUILD='2026-10-24',CHANGELOG=[['1.2.0','In-game menu: screenshot, 3 save slots, mute, fullscreen'],['1.1.0','Backup and restore, tidier Settings, version number'],['1.0.0','First numbered version: library, covers, resume, screenshots, install']];
+const APP_VERSION='1.4.0',APP_BUILD='2026-10-24',CHANGELOG=[['1.4.0','Android back button, cover size, clearer empty states, search clear, new sort options, CSS cleanup'],['1.3.0','Cover picker (auto-pick, then choose other art), import progress and storage checks'],['1.2.0','In-game menu: screenshot, 3 save slots, mute, fullscreen'],['1.1.0','Backup and restore, tidier Settings, version number'],['1.0.0','First numbered version: library, covers, resume, screenshots, install']];
 const AR={nes:.72,snes:1.4,sms:.72,gen:.72,sat:1,gb:.9,gbc:.9,gba:.9,n64:1.4,ps1:1,nds:.8,psp:.58,dc:1,ps2:.72,gc:.72,'3ds':.85,wii:.72};
 const measure=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(Math.min(1.8,Math.max(.5,i.naturalWidth/i.naturalHeight)));i.onerror=()=>r(0);i.src=src});
 const urlToCover=async u=>{try{const b=await (await fetch(u)).blob();return await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)})}catch{return u}};
 async function shrink(src){if(!src||!src.startsWith('data:'))return src;try{const im=await new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=src}),k=Math.min(1,640/Math.max(im.naturalWidth,im.naturalHeight));if(k===1&&src.length<2e5)return src;const c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85)}catch{return src}}
 async function setCover(g,src){src=await shrink(src||'');g.cover=src||'';g.ar=src?await measure(src):0}
 async function backfill(){let ch=0;for(const g of games.filter(g=>g.cover&&g.ar===undefined)){g.ar=await measure(g.cover);await putG(g);ch=1}if(ch)render()}
-async function autoCovers(l){let n=0;for(const [i,g] of l.entries()){toast(`Fetching cover art… ${i+1} of ${l.length}`);try{await setCover(g,await findCover(g));await putG(g);n++;render()}catch(e){if(/rejected/.test(e.message))break}}toast(`Found cover art for ${n} of ${l.length} game${l.length===1?'':'s'}.`)}
+async function autoCovers(l){let n=0;for(const [i,g] of l.entries()){if(impCancel)break;prog(true,'Fetching cover art',i/l.length,`${i+1} of ${l.length} · ${g.title}`);try{await setCover(g,await findCover(g));await putG(g);n++;render()}catch(e){if(/rejected/.test(e.message))break}}prog(false);toast(`Found cover art for ${n} of ${l.length} game${l.length===1?'':'s'}.${n?' Open a game and tap Change cover to pick other art.':''}`)}
 const DECOMPS=[{c:"Zombies",n:"BO1 Zombies",u:"https://vel.gg/bo1z"},{c:"Zombies",n:"Moon",u:"https://moon-zombies.pages.dev"},{c:"Zombies",n:"Kino der Toten",u:"https://kino-der-toten.pages.dev"},{c:"Zombies",n:"BO3 Cheese Cube",u:"https://cheese-cube.pages.dev"},{c:"Shooters",n:"Black Ops 2",u:"https://vibeslops.luckeysystems.com"},{c:"Shooters",n:"Modern Warfare 2",u:"https://ovz-game-production.up.railway.app"},{c:"Shooters",n:"Halo CE",u:"https://mitchellhynes.com/halo"},{c:"Shooters",n:"Halo CE Mobile",u:"https://hcemobile.com"},{c:"Shooters",n:"Quake 1",u:"https://q1.pieter.com"},{c:"Shooters",n:"Quake 2",u:"https://q2.pieter.com"},{c:"Shooters",n:"Quake 3",u:"https://q3.pieter.com"},{c:"Shooters",n:"Return to Castle Wolfenstein",u:"https://rtcw.pieter.com"},{c:"Shooters",n:"Unreal Tournament",u:"https://ut.pieter.com"},{c:"Shooters",n:"Half-Life",u:"https://pixelsuft.github.io/hl/"},{c:"Shooters",n:"Half-Life / CS 1.6",u:"https://x8bitrain.github.io/webXash/"},{c:"Shooters",n:"CS Surf",u:"https://surfd.net"},{c:"Shooters",n:"Diablo",u:"https://johnimril.github.io/diablo_web/"},{c:"Open world / other",n:"GTA Vice City",u:"https://joncodeofficial.github.io/gta-vice-city-wasm/"},{c:"Open world / other",n:"The Simpsons: Hit & Run",u:"https://shar-wasm.cjoseph.workers.dev/?skipmovie"},{c:"Open world / other",n:"Skate 3",u:"https://skate.aaddpp.lol"},{c:"Open world / other",n:"Skate Rust",u:"https://global-terror.net"},{c:"Open world / other",n:"PES 6",u:"https://pes6.optijuegos.net"},{c:"Open world / other",n:"Hedgewars",u:"https://webwars.link"},{c:"Open world / other",n:"More GTA / Minecraft",u:"https://wasmarcade.com"}];
 const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 const ab=b=>b.arrayBuffer?b.arrayBuffer():new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsArrayBuffer(b)});
-async function crc32(blob){let c=-1;for(let o=0;o<blob.size;o+=8<<20){const b=new Uint8Array(await ab(blob.slice(o,o+(8<<20))));for(let i=0;i<b.length;i++)c=CRCT[(c^b[i])&255]^(c>>>8)}return(~c)>>>0}
-async function makeZip(files){const parts=[],cd=[],enc=new TextEncoder();let off=0;
-for(const f of files){const nm=enc.encode(f.zn||f.name),crc=await crc32(f),sz=f.size,h=new DataView(new ArrayBuffer(30)),c=new DataView(new ArrayBuffer(46));
+async function crc32(blob,cb){let c=-1;for(let o=0;o<blob.size;o+=8<<20){const b=new Uint8Array(await ab(blob.slice(o,o+(8<<20))));for(let i=0;i<b.length;i++)c=CRCT[(c^b[i])&255]^(c>>>8);cb&&cb(Math.min(1,(o+(8<<20))/blob.size))}return(~c)>>>0}
+async function makeZip(files,cb){const parts=[],cd=[],enc=new TextEncoder();let off=0;
+for(const [fi,f] of files.entries()){const nm=enc.encode(f.zn||f.name),crc=await crc32(f,x=>cb&&cb((fi+x)/files.length)),sz=f.size,h=new DataView(new ArrayBuffer(30)),c=new DataView(new ArrayBuffer(46));
 h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint32(14,crc,true);h.setUint32(18,sz,true);h.setUint32(22,sz,true);h.setUint16(26,nm.length,true);parts.push(h,nm,f);
 c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint32(16,crc,true);c.setUint32(20,sz,true);c.setUint32(24,sz,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);cd.push(c,nm);off+=30+nm.length+sz}
 let cs=0;for(const x of cd)cs+=x.byteLength;const e=new DataView(new ArrayBuffer(22));
@@ -306,16 +330,16 @@ e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,f
 return new Blob([...parts,...cd,e],{type:'application/zip'})}
 async function bundleCues(fs){let out=fs.slice();for(const q of fs.filter(f=>/\.cue$/i.test(f.name))){
 const names=[...(await q.text()).matchAll(/FILE\s+"([^"]+)"/gi)].map(m=>m[1].split(/[\\/]/).pop().toLowerCase()),bins=out.filter(f=>names.includes(f.name.toLowerCase()));
-if(!bins.length)continue;toast('Packing '+q.name+'…');const f=new File([await makeZip([q,...bins])],q.name.replace(/\.cue$/i,'')+'.zip',{type:'application/zip'});f._con='ps1';out=out.filter(x=>x!==q&&!bins.includes(x));out.push(f)}return out}
+if(!bins.length)continue;prog(true,'Packing '+q.name,0,'Combining disc files');const f=new File([await makeZip([q,...bins],fr=>prog(true,'Packing '+q.name,fr,'Combining disc files'))],q.name.replace(/\.cue$/i,'')+'.zip',{type:'application/zip'});f._con='ps1';out=out.filter(x=>x!==q&&!bins.includes(x));out.push(f)}prog(false);return out}
 const fmtT=ms=>!ms?'—':ms<6e4?'under a minute':ms<36e5?Math.round(ms/6e4)+' min':(ms/36e5).toFixed(1)+' h';
 function addTime(){if(EMU&&EMU.t0){EMU.g.time=(EMU.g.time||0)+Math.min(Date.now()-EMU.t0,432e5);EMU.t0=Date.now();putG(EMU.g)}}
 const getRom=id=>new Promise(r=>{try{const q=db.transaction('roms').objectStore('roms').get(id);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
 const allKeys=st=>new Promise(r=>{try{const q=db.transaction(st).objectStore(st).getAllKeys();q.onsuccess=()=>r(q.result);q.onerror=()=>r([])}catch{r([])}});
-async function makeBackup(withRoms){const files=[],add=(zn,b)=>{const f=new File([b],'x');f.zn=zn;files.push(f)};
+async function makeBackup(withRoms,cb){const files=[],add=(zn,b)=>{const f=new File([b],'x');f.zn=zn;files.push(f)};
 add('library.json',new Blob([JSON.stringify({app:'cartridge',format:1,version:APP_VERSION,created:Date.now(),withRoms,games,prefs:pref,custom,links:LS('c_links',[]),sg:{proxy:SG().proxy,ejs:SG().ejs}})],{type:'application/json'}));
 for(const k of await allKeys('states')){const b=await getSt(k);if(b)add('states/'+encodeURIComponent(k),b)}
 if(withRoms)for(const g of games){const b=await getRom(g.id);if(b)add('roms/'+g.id,b)}
-return makeZip(files)}
+return makeZip(files,cb)}
 async function readZip(file){const tail=new Uint8Array(await ab(file.slice(Math.max(0,file.size-66000))));let e=-1;
 for(let i=tail.length-22;i>=0;i--)if(tail[i]===0x50&&tail[i+1]===0x4b&&tail[i+2]===5&&tail[i+3]===6){e=i;break}
 if(e<0)throw new Error('This is not a Cartridge backup file.');
@@ -333,6 +357,10 @@ for(const c of meta.custom||[])if(!custom.some(x=>x.id===c.id))custom.push(c);SV
 const L=LS('c_links',[]);for(const l of meta.links||[])if(!L.some(x=>x.u===l.u))L.push(l);SV('c_links',L);
 if(meta.prefs)Object.assign(pref,meta.prefs);savePref();if(meta.sg)SV('c_sg',Object.assign({},SG(),meta.sg));
 return {n,roms}}
+history.replaceState({v:'home'},'');
+addEventListener('popstate',e=>{const d=$('#dlg');if(EMU){history.pushState({v:view},'');return toast('Use ✕ to leave the game.')}
+if(d.open){d.close();history.pushState({v:view},'');return}
+view=(e.state&&e.state.v)||'home';render()});
 let EMU=null;
 function goFS(){if(!(pref.fs??matchMedia('(pointer:coarse)').matches))return;const e=document.documentElement,f=e.requestFullscreen||e.webkitRequestFullscreen;try{const r=f&&f.call(e,{navigationUI:'hide'});r&&r.catch&&r.catch(()=>{})}catch{}}
 function outFS(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch{}}
@@ -382,6 +410,9 @@ document.addEventListener('visibilitychange',()=>{if(!EMU)return;if(document.hid
 const mk=p=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const IC={home:mk('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'),all:mk('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),fav:mk('<path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.5A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/>'),recent:mk('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),played:mk('<path d="M7 4l13 8-13 8z"/>'),web:mk('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'),set:mk('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'),rnd:mk('<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>'),plus:mk('<path d="M12 5v14M5 12h14"/>'),dots:mk('<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>'),save:mk('<path d="M5 3h12l3 3v15H5z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/>'),load:mk('<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>'),vol:mk('<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>'),mute:mk('<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/>'),fs:mk('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),cam:mk('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>')};
 const PAD='<svg class="pad" viewBox="0 0 160 104" aria-hidden="true"><g style="fill:none;stroke:var(--ac);stroke-width:5;stroke-linecap:round"><path d="M36 28C40 17 56 14 66 20"/><path d="M124 28C120 17 104 14 94 20"/></g><path d="M52 22H108C122 22 130 28 134 40L146 74C150 88 142 96 132 96C124 96 120 90 115 82C112 77 108 74 102 74H58C52 74 48 77 45 82C40 90 36 96 28 96C18 96 10 88 14 74L26 40C30 28 38 22 52 22Z" style="fill:var(--card);stroke:var(--ac);stroke-width:2.5;stroke-linejoin:round"/><g style="fill:none;stroke:var(--mu);stroke-width:2.5"><circle cx="46" cy="42" r="7"/><circle cx="96" cy="62" r="7"/></g><g style="fill:var(--mu)"><circle cx="46" cy="42" r="2.5"/><circle cx="96" cy="62" r="2.5"/><rect x="56.5" y="58.5" width="15" height="7" rx="2"/><rect x="60.5" y="54.5" width="7" height="15" rx="2"/><circle cx="106" cy="42" r="4.2"/><circle cx="114" cy="50" r="4.2"/><rect x="67" y="39" width="8" height="3" rx="1.5"/><rect x="85" y="39" width="8" height="3" rx="1.5"/></g><g style="fill:var(--ac)"><circle cx="114" cy="34" r="4.2"/><circle cx="122" cy="42" r="4.2"/><circle cx="80" cy="31" r="3.5"/></g></svg>';
+let impCancel=false;
+function prog(show,t,frac,sub){const p=$('#prog');p.hidden=!show;if(!show)return;$('#ipt').textContent=t;$('#ipf').style.width=Math.round(Math.min(1,Math.max(0,frac||0))*100)+'%';$('#ips').textContent=sub||''}
+$('#ipc').onclick=()=>{impCancel=true;$('#ipt').textContent='Cancelling…'};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3500)};
 function theme(){document.documentElement.dataset.theme=pref.theme;document.documentElement.style.setProperty('--ac',pref.ac)}
 const savePref=()=>{SV('c_pref',pref);theme()};
@@ -405,9 +436,12 @@ if(view==='fav')l=l.filter(g=>g.fav);if(view==='played')l=l.filter(g=>g.played);
 if(view==='recent'||pref.filter==='recent')l=l.filter(g=>Date.now()-g.added<7*864e5);
 if(pref.filter==='fav')l=l.filter(g=>g.fav);
 if(q)l=l.filter(g=>(g.title+' '+con(g.con).name+' '+g.file).toLowerCase().includes(q));
-const s={title:(a,b)=>a.title.localeCompare(b.title),console:(a,b)=>con(a.con).name.localeCompare(con(b.con).name)||a.title.localeCompare(b.title),added:(a,b)=>b.added-a.added,size:(a,b)=>b.size-a.size}[pref.sort];l.sort(s);if(view==='played')l.sort((a,b)=>b.played-a.played);return l}
+const s={title:(a,b)=>a.title.localeCompare(b.title),console:(a,b)=>con(a.con).name.localeCompare(con(b.con).name)||a.title.localeCompare(b.title),added:(a,b)=>b.added-a.added,size:(a,b)=>b.size-a.size,played:(a,b)=>b.played-a.played,time:(a,b)=>(b.time||0)-(a.time||0)}[pref.sort];l.sort(s);if(view==='played')l.sort((a,b)=>b.played-a.played);return l}
+function emptyFor(){const q=$('#q').value.trim();if(!games.length)return empty('Your library is empty');
+const m={fav:['No favorites yet','Open a game and tap Favorite to pin it here.'],played:['Nothing played yet','Games you launch will show up here.'],recent:['Nothing added this week','Games you import show up here for seven days.']}[view],[t,pp]=q?['No games match “'+q+'”','Check the spelling or try a shorter search.']:(m||['No games here','Try a different filter.']);
+return `<div class="empty">${PAD}<h2 style="margin-top:0">${esc(t)}</h2><p>${esc(pp)}</p>${q?'<button class="btn" id="clr">Clear search</button>':''}</div>`}
 function empty(msg){return `<div class="empty">${PAD}<h2 style="margin-top:0">${msg||'Your library is empty'}</h2><p>Drop ROM files here, or import them yourself. Nothing is uploaded anywhere.</p><button class="btn pri" onclick="$('#fi').click()">Import games</button></div>`}
-function render(){nav();const el=$('#content');if(render.v!==view){render.v=view;el.classList.remove('in');void el.offsetWidth;el.classList.add('in')}
+function render(){nav();const el=$('#content');el.dataset.size=pref.size||'m';if(render.v!==view){render.v=view;el.classList.remove('in');void el.offsetWidth;el.classList.add('in')}
 if(view==='set')return settings(el);
 if(view==='web')return web(el);
 if(view==='home'&&!$('#q').value.trim()){
@@ -423,11 +457,11 @@ const l=filtered(),c=view.startsWith('c:')?con(view.slice(2)):null;
 const title=c?c.name:{all:'All games',fav:'Favorites',recent:'Recently added',played:'Recently played',home:'Search results'}[view];
 const chips=(view==='all'||view.startsWith('c:'))?`<div class="chips"><button class="chip ${view==='all'?'on':''}" data-v="all">All</button>${cons().filter(x=>games.some(g=>g.con===x.id)).map(x=>`<button class="chip ${view==='c:'+x.id?'on':''}" data-v="c:${x.id}">${esc(x.s)}</button>`).join('')}</div>`:'';
 el.innerHTML=`<h1>${esc(title)}</h1><p class="sub">${l.length} game${l.length===1?'':'s'}${c&&!c.core?' · no built-in browser emulator for this system — use an external emulator':''}</p>
-${chips}<div class="bar"><select id="so" aria-label="Sort"><option value="title">Sort: title</option><option value="console">Sort: console</option><option value="added">Sort: date added</option><option value="size">Sort: file size</option></select>
+${chips}<div class="bar"><select id="so" aria-label="Sort"><option value="title">Sort: title</option><option value="console">Sort: console</option><option value="added">Sort: date added</option><option value="size">Sort: file size</option><option value="played">Sort: last played</option><option value="time">Sort: play time</option></select>
 <select id="fl" aria-label="Filter"><option value="all">Show all</option><option value="fav">Favorites only</option><option value="recent">Added this week</option></select>
-<button class="btn" id="vm">${pref.mode==='grid'?'☰ List view':'▦ Grid view'}</button></div>`+(l.length?`<div class="${pref.mode}">${l.map(card).join('')}</div>`:empty(games.length?'No games match':'Your library is empty'));
-$('#so').value=pref.sort;$('#fl').value=pref.filter;
-$('#so').onchange=e=>{pref.sort=e.target.value;savePref();render()};$('#fl').onchange=e=>{pref.filter=e.target.value;savePref();render()};$('#vm').onclick=()=>{pref.mode=pref.mode==='grid'?'list':'grid';savePref();render()}}
+<select id="sz" aria-label="Cover size"><option value="s">Small covers</option><option value="m">Medium covers</option><option value="l">Large covers</option></select><button class="btn" id="vm">${pref.mode==='grid'?'☰ List view':'▦ Grid view'}</button></div>`+(l.length?`<div class="${pref.mode}">${l.map(card).join('')}</div>`:emptyFor());
+$('#so').value=pref.sort;$('#sz').value=pref.size||'m';const cb=$('#clr');if(cb)cb.onclick=()=>{$('#q').value='';$('#qx').hidden=true;render()};$('#fl').value=pref.filter;
+$('#sz').onchange=e=>{pref.size=e.target.value;savePref();render()};$('#so').onchange=e=>{pref.sort=e.target.value;savePref();render()};$('#fl').onchange=e=>{pref.filter=e.target.value;savePref();render()};$('#vm').onclick=()=>{pref.mode=pref.mode==='grid'?'list':'grid';savePref();render()}}
 
 function web(el){
 const q=$('#q').value.trim().toLowerCase(),all=DECOMPS.concat(LS('c_links',[]).map(x=>({...x,own:1}))).filter(l=>!q||(l.n+' '+l.u+' '+l.c).toLowerCase().includes(q)),cats=[...new Set(all.map(l=>l.c))];
@@ -482,7 +516,7 @@ $('#ska').onclick=async()=>{sv();const t=games.filter(g=>!g.cover);if(!t.length)
 for(const [i,g] of t.entries()){toast(`Finding covers… ${i+1} of ${t.length}`);try{await setCover(g,await findCover(g));await putG(g);ok++}catch(e){fail++;last=e.message;if(/rejected|reach/.test(last))break}}
 render();msg('Cover search finished',`${ok} found, ${fail} not found or failed.`+(fail&&last?' Last problem: '+last:''))};
 if(ip)$('#ins').onclick=async()=>{ip.prompt();await ip.userChoice;ip=null;render()};
-$('#nm').oninput=e=>{pref.name=e.target.value.trim().slice(0,30);SV('c_pref',pref)};$('#bkm').onclick=async()=>{const b=$('#bkm');b.disabled=true;toast('Preparing backup…');try{const z=await makeBackup($('#bkw').checked),a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='cartridge-backup-'+new Date().toISOString().slice(0,10)+'.zip';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),6e4);toast('Backup created ('+fmt(z.size)+').')}catch(e){msg('Backup failed',e.message||'Something went wrong.')}b.disabled=false};
+$('#nm').oninput=e=>{pref.name=e.target.value.trim().slice(0,30);SV('c_pref',pref)};$('#bkm').onclick=async()=>{const b=$('#bkm');b.disabled=true;toast('Preparing backup…');try{const z=await makeBackup($('#bkw').checked,fr=>prog(true,'Creating backup',fr,'')),a=document.createElement('a');a.href=URL.createObjectURL(z);a.download='cartridge-backup-'+new Date().toISOString().slice(0,10)+'.zip';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),6e4);prog(false);toast('Backup created ('+fmt(z.size)+').')}catch(e){prog(false);msg('Backup failed',e.message||'Something went wrong.')}b.disabled=false};
 $('#bkr').onclick=()=>$('#bkf').click();
 $('#bkf').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;confirmD('Restore from “'+f.name+'”? Games and saves in the backup are added, and anything with the same ID is replaced. Your other games are kept.',async()=>{toast('Restoring…');try{const r=await restoreBackup(f);render();msg('Restore complete',r.n+' game'+(r.n===1?'':'s')+' restored'+(r.roms?', '+r.roms+' with game files.':'. The backup had no game files; import them again and they will reattach to their entries.'))}catch(err){msg('Restore failed',err.message||'Something went wrong.')}})};
 $('#upd').onclick=async()=>{try{const r=await navigator.serviceWorker.getRegistration();if(!r)return toast('Updates only work in the installed or hosted app.');await r.update();toast('Checked. If a new version exists, a prompt appears.')}catch{toast('Couldn’t check for updates.')}};
@@ -503,8 +537,13 @@ function conOpts(sel){return cons().map(c=>`<option value="${c.id}" ${c.id===sel
 
 async function addFiles(files){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch{}
 files=await bundleCues([...files]);if(!files.length)return;
+const total=files.reduce((a,f)=>a+f.size,0)||1;
+try{const e=await navigator.storage.estimate();if(e.quota&&total>e.quota-e.usage)return msg('Not enough storage',`These files add up to ${fmt(total)}, but only ${fmt(Math.max(0,e.quota-e.usage))} is free on this device. Free up space, remove games you don’t play, or import fewer at once.`)}catch{}
+impCancel=false;
 const res=[],added=[];let ok=0;
-for(const f of files){const e=(f.name.split('.').pop()||'').toLowerCase();let id=f._con||detect(f.name),st='Imported';
+for(const [fi,f] of files.entries()){if(impCancel){res.push([f.name,f.size,'—','Cancelled']);continue}
+prog(true,`Importing ${fi+1} of ${files.length}`,files.slice(0,fi).reduce((a,x)=>a+x.size,0)/total,f.name+' · '+fmt(f.size));
+const e=(f.name.split('.').pop()||'').toLowerCase();let id=f._con||detect(f.name),st='Imported';
 if(f.size===0){res.push([f.name,0,'—','Skipped: file is empty']);continue}
 if(f.name.startsWith('.')||/^(txt|nfo|jpg|png|md|db|ini|exe|dll)$/.test(e)){res.push([f.name,f.size,'—','Skipped: not a game file']);continue}
 const ex=games.find(g=>g.file===f.name&&g.size===f.size);if(ex){if(await getRom(ex.id)){res.push([f.name,f.size,'—','Skipped: already in library']);continue}await tx('roms','readwrite',t=>t.objectStore('roms').put(f,ex.id));res.push([f.name,f.size,con(ex.con).s,'Reattached to the existing entry']);ok++;continue}
@@ -512,18 +551,18 @@ if(!id){id='other';st=AMBIG[e]?'Imported — choose console ('+AMBIG[e]+')':'Imp
 if(f._con)st='Imported — .cue and .bin packed into one file (assumed PlayStation)';
 const g={id:crypto.randomUUID(),title:clean(f.name),file:f.name,size:f.size,con:id,added:Date.now(),fav:false,desc:'',cover:'',played:0};
 try{await tx(['games','roms'],'readwrite',t=>{t.objectStore('games').put(g);t.objectStore('roms').put(f,g.id)});games.push(g);added.push(g);ok++;res.push([f.name,f.size,con(id).s,st])}
-catch(err){res.push([f.name,f.size,'—','Failed: browser storage is full or blocked'])}}
-render();const d=$('#dlg');
+catch(err){res.push([f.name,f.size,'—','Failed: '+(err&&err.name==='QuotaExceededError'?'not enough storage':'the browser couldn’t store this file')])}}
+prog(false);render();const d=$('#dlg');
 d.innerHTML=`<h2 style="margin-top:0">Import complete: ${ok} of ${files.length} added</h2><div style="max-height:50vh;overflow:auto"><table><tr><th>File</th><th>Size</th><th>Console</th><th>Status</th></tr>${res.map(r=>`<tr><td>${esc(r[0])}</td><td>${fmt(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join('')}</table></div><div class="acts"><button class="btn pri" id="ok">Done</button></div>`;
-$('#ok').onclick=()=>d.close();d.showModal();if(pref.ap!==false&&added.length)autoCovers(added)}
+$('#ok').onclick=()=>d.close();d.showModal();if(pref.ap!==false&&added.length&&!impCancel)autoCovers(added)}
 
 function details(id){const g=games.find(x=>x.id===id);if(!g)return;const c=con(g.con),d=$('#dlg');
 d.innerHTML=`<button class="x" id="cx" aria-label="Close">✕</button><div class="dh"><div class="dc">${cover(g)}</div><div class="di"><h2>${esc(g.title)}</h2><p class="sub" style="margin:0 0 10px">${esc(c.name)}</p><dl class="meta"><dt>Size</dt><dd class="mono">${fmt(g.size)}</dd><dt>Play time</dt><dd class="mono">${fmtT(g.time)}</dd><dt>Last played</dt><dd class="mono">${g.played?new Date(g.played).toLocaleDateString():'Never'}</dd></dl></div></div>${g.desc?`<p class="desc">${esc(g.desc)}</p>`:''}
 <button class="btn pri big" id="pl">${IC.played}${g.state?'Resume':'Play'}</button>
-<div class="tools"><button class="btn" id="fv">${IC.fav}<span>${g.fav?'Unfavorite':'Favorite'}</span></button><button class="btn" id="ed">Edit</button><button class="btn" id="gal">Screenshots</button><button class="btn" id="fcv">Find cover</button>${g.state?'<button class="btn" id="rs">Reset save</button>':''}<button class="btn dng" id="rm">Remove</button></div><p class="file mono">${esc(g.file)}</p>`;
+<div class="tools"><button class="btn" id="fv">${IC.fav}<span>${g.fav?'Unfavorite':'Favorite'}</span></button><button class="btn" id="ed">Edit</button><button class="btn" id="gal">Screenshots</button><button class="btn" id="fcv">${g.cover?'Change cover':'Find cover'}</button>${g.state?'<button class="btn" id="rs">Reset save</button>':''}<button class="btn dng" id="rm">Remove</button></div><p class="file mono">${esc(g.file)}</p>`;
 $('#cx').onclick=()=>d.close();
 if(g.state)$('#rs').onclick=async()=>{await tx('states','readwrite',t=>t.objectStore('states').delete(id));g.state=false;await putG(g);toast('Save state cleared.');details(id)};
-$('#fcv').onclick=async()=>{const b=$('#fcv');b.disabled=true;b.textContent='Searching…';try{await setCover(g,await findCover(g));await putG(g);render();details(id);toast('Cover updated.')}catch(e){b.disabled=false;b.textContent='Find cover';msg('Couldn’t find a cover',e.message)}};
+$('#fcv').onclick=()=>coverPicker(g);
 $('#gal').onclick=()=>gallery(g);
 $('#fv').onclick=async()=>{g.fav=!g.fav;await putG(g);render();details(id)};
 $('#rm').onclick=()=>confirmD(`Remove “${g.title}” from the library? The stored copy is deleted from this browser; your original file is untouched.`,async()=>{await tx(['games','roms','states'],'readwrite',t=>{t.objectStore('games').delete(id);t.objectStore('roms').delete(id);t.objectStore('states').delete(id);t.objectStore('states').delete(SSK(id));t.objectStore('states').delete(IDBKeyRange.bound('qs:'+id+':','qs:'+id+':\uffff'))});games=games.filter(x=>x.id!==id);render();toast('Game removed.')});
@@ -557,10 +596,12 @@ w.querySelector('iframe').srcdoc=`<meta name="viewport" content="width=device-wi
 EMU={g,w,t0:Date.now()};setupMenu(w);$('#eq').onclick=async()=>{$('#eq').disabled=true;let ok=false;if(pref.auto!==false)ok=await saveState();addTime();w.remove();outFS();EMU=null;URL.revokeObjectURL(url);if(sUrl)URL.revokeObjectURL(sUrl);render();if(ok)toast('Progress saved. It resumes next time.')};render()}
 function msg(t,m){const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">${esc(t)}</h2><p>${esc(m)}</p><div class="acts"><button class="btn pri" id="ok">OK</button></div>`;$('#ok').onclick=()=>d.close();if(!d.open)d.showModal()}
 
-document.addEventListener('click',e=>{if(!e.target.closest('#side,#tg'))$('#side').classList.remove('open');const pb=e.target.closest('[data-play]');if(pb){const g=games.find(x=>x.id===pb.dataset.play);if(g)play(g);return}const v=e.target.closest('[data-v]');if(v){view=v.dataset.v;$('#q').value='';$('#side').classList.remove('open');render();$('#content').scrollTop=0;return}
+document.addEventListener('click',e=>{if(!e.target.closest('#side,#tg'))$('#side').classList.remove('open');const pb=e.target.closest('[data-play]');if(pb){const g=games.find(x=>x.id===pb.dataset.play);if(g)play(g);return}const v=e.target.closest('[data-v]');if(v){view=v.dataset.v;if((history.state&&history.state.v)!==view)history.pushState({v:view},'');$('#q').value='';$('#side').classList.remove('open');render();$('#content').scrollTop=0;return}
 const c=e.target.closest('.card');if(c)details(c.dataset.id)});
 $('#tg').onclick=()=>{const s=$('#side');innerWidth<761?s.classList.toggle('open'):s.classList.toggle('min')};
-$('#q').oninput=()=>{if((view==='home'||view==='set')&&$('#q').value.trim())view='all';render()};
+$('#qx').onclick=()=>{$('#q').value='';$('#qx').hidden=true;render();$('#q').focus()};
+$('#q').onkeydown=e=>{if(e.key==='Escape'){e.target.value='';$('#qx').hidden=true;e.target.blur();render()}};
+$('#q').oninput=()=>{$('#qx').hidden=!$('#q').value;if((view==='home'||view==='set')&&$('#q').value.trim())view='all';render()};
 $('#imp').onclick=()=>{const d=$('#dlg');d.innerHTML=`<h2 style="margin-top:0">Import games</h2><p>Only import games you legally own. Files stay in this browser.</p><div class="acts" style="justify-content:flex-start"><button class="btn pri" id="a1">Choose files</button><button class="btn" id="a2">Choose folder</button><button class="btn" id="a3">Cancel</button></div>`;$('#a1').onclick=()=>{d.close();$('#fi').click()};$('#a2').onclick=()=>{d.close();$('#fd').click()};$('#a3').onclick=()=>d.close();d.showModal()};
 $('#fi').onchange=e=>{addFiles(e.target.files);e.target.value=''};$('#fd').onchange=e=>{addFiles(e.target.files);e.target.value=''};
 $('#rnd').onclick=()=>{const l=view==='home'?games:filtered();if(!l.length)return toast('Import some games first.');details(l[Math.random()*l.length|0].id)};
